@@ -1,0 +1,85 @@
+---
+title: "Core Concepts: Projects, Environments, and Deployments"
+sidebarTitle: "Core Concepts"
+description: "Learn the fundamental building blocks of Varo Cloud: projects, environments, deployments, API keys, and how they all fit together."
+---
+
+Varo Cloud is built around a small set of foundational abstractions that every user needs to understand before working with the platform in earnest. Projects, environments, deployments, and API keys are the building blocks on which everything else rests — once you have a clear mental model of how they fit together, navigating the dashboard and the API will feel intuitive and predictable.
+
+## Projects
+
+A project is the top-level container for your application or service on Varo Cloud. Every resource you create — environments, deployments, secrets — lives inside a project, and each project maps one-to-one to a single application or service. When you create a project, you give it a name and select a primary deployment region. You can have as many projects as you need within your organization.
+
+Here is what a project object looks like in the API:
+
+```json
+{
+  "id": "proj_abc123",
+  "name": "my-first-app",
+  "region": "us-east-1",
+  "status": "active",
+  "environments": ["development", "staging", "production"],
+  "created_at": "2024-06-01T10:00:00Z"
+}
+```
+
+## Environments
+
+Environments represent the distinct deployment targets within a project. A typical setup mirrors your development workflow: a `development` environment for active work, a `staging` environment for pre-release validation, and a `production` environment for live traffic. Each environment maintains its own configuration values, secrets, and deployment history, so a setting in production never accidentally leaks into development.
+
+<Tabs>
+  <Tab title="Development">
+    The `development` environment is where you do your day-to-day work. It is optimized for fast iteration — deployments are quick, log verbosity is high, and you can safely experiment without any risk to real users. Think of it as your personal sandbox within the shared project.
+  </Tab>
+  <Tab title="Staging">
+    The `staging` environment mirrors production as closely as possible. Use it to run integration tests, QA checks, and final reviews before releasing to real users. Staging should share the same configuration structure as production, with test-safe credentials substituted where needed.
+  </Tab>
+  <Tab title="Production">
+    The `production` environment serves your live users. Deployments here go through the full build and health-check pipeline, and rollbacks are always one step away if something unexpected happens. Tightly control who on your team has permission to deploy to production using role-based access in your organization settings.
+  </Tab>
+</Tabs>
+
+## Deployments
+
+A deployment is a single, versioned release of your application to a specific environment. Every time you push new code or configuration to an environment, Varo Cloud creates a new deployment record that tracks exactly what was shipped and when.
+
+The deployment lifecycle moves through the following states:
+
+| Status | Meaning |
+|---|---|
+| `queued` | The deployment has been accepted and is waiting for a build runner. |
+| `building` | Varo Cloud is building your application from source. |
+| `deploying` | The built artifact is being rolled out to the target environment. |
+| `active` | The deployment is live and serving traffic. |
+| `failed` | Something went wrong. Inspect the deployment logs for details. |
+
+Here is what a deployment object looks like in the API:
+
+```json
+{
+  "id": "dep_xyz789",
+  "project_id": "proj_abc123",
+  "environment": "production",
+  "status": "active",
+  "version": "v1.4.2",
+  "created_at": "2024-06-01T10:05:00Z"
+}
+```
+
+## API Keys
+
+API keys are how you authenticate requests to the Varo Cloud API from your own tools, scripts, and CI/CD pipelines. Each key is scoped to your organization and inherits the permissions of the user who created it. You can create multiple keys — one per integration or environment — and revoke any individual key at any time without affecting the others.
+
+To learn how to generate and manage API keys, see [Authentication](/setup/authentication).
+
+## Relationships
+
+The resources in Varo Cloud form a clear hierarchy. Understanding this structure makes it easy to reason about where a given resource lives and who has access to it.
+
+<Note>
+  **Resource hierarchy:**
+
+  **Organization** → **Projects** → **Environments** → **Deployments**
+
+  Your organization is the root container that owns all billing, members, and API keys. Each project belongs to one organization. Each project can have multiple environments. Each environment accumulates a history of deployments over time.
+</Note>

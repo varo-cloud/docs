@@ -1,0 +1,112 @@
+---
+title: "Varo Cloud Plans, Billing, and Usage Management"
+sidebarTitle: "Billing"
+description: "Understand Varo Cloud pricing plans, manage your subscription, view usage, download invoices, configure spend alerts, and update your payment method."
+---
+
+Varo Cloud offers tiered pricing plans to match your team size and usage needs. Whether you are a solo developer experimenting with a side project or an enterprise team running mission-critical workloads, there is a plan designed to scale with you. All billing is managed from the **Settings → Billing** section of your dashboard.
+
+## Plans overview
+
+<CardGroup cols={3}>
+  <Card title="Starter" icon="seedling" href="/setup/billing">
+    **Free**
+
+    The Starter plan is ideal for individuals and small projects. It includes:
+
+    - 1 active project
+    - 3 default environments per project
+    - Community support via the Varo Cloud forum
+    - Standard build minutes and bandwidth allowances
+
+    No credit card is required to get started on the Starter plan.
+  </Card>
+  <Card title="Pro" icon="bolt" href="/setup/billing">
+    **Paid (monthly or annual)**
+
+    The Pro plan is designed for growing teams that need more headroom and reliability. It includes everything in Starter, plus:
+
+    - Unlimited projects
+    - Priority email and chat support
+    - Advanced monitoring and alerting
+    - Higher build minute and bandwidth limits
+    - Team member roles and permissions
+  </Card>
+  <Card title="Enterprise" icon="building" href="/setup/billing">
+    **Custom pricing**
+
+    The Enterprise plan is built for organizations with strict compliance, security, and scale requirements. It includes everything in Pro, plus:
+
+    - Custom SLA with guaranteed uptime
+    - Dedicated support and a named account manager
+    - Single sign-on (SSO) via SAML or OIDC
+    - Invoiced billing and purchase order support
+    - Advanced audit logging and compliance exports
+  </Card>
+</CardGroup>
+
+## View your current plan
+
+To see which plan your organization is on and a summary of your current usage, navigate to **Settings → Billing** in the dashboard. The Billing overview page shows:
+
+- Your active plan name and renewal date.
+- A usage summary for the current billing period, including deployments, build minutes, and bandwidth consumed.
+- Any pending invoices or payment issues that require attention.
+
+## Upgrade or downgrade
+
+You can change your plan at any time from the dashboard. To upgrade or downgrade:
+
+1. Go to **Settings → Billing**.
+2. Click **Change Plan**.
+3. Select the plan you want to switch to.
+4. Review the pricing details and confirm the change.
+
+<Note>
+  Plan changes are prorated. If you upgrade mid-cycle, you are charged only for the remaining days in the billing period at the new plan's rate. If you downgrade, the unused portion of your current plan is credited toward future invoices.
+</Note>
+
+<Warning>
+  Downgrading may reduce your project or team member limits. Review the impact before confirming. If your current usage exceeds the limits of the lower plan, you will need to archive projects or remove team members before the downgrade takes effect.
+</Warning>
+
+## Payment methods
+
+Varo Cloud accepts the following payment methods for Starter and Pro plans:
+
+- **Visa**
+- **Mastercard**
+- **American Express (AMEX)**
+
+Enterprise customers can arrange **invoiced billing** with net payment terms and purchase order support — contact your account manager to set this up.
+
+To add or update a credit card, go to **Settings → Billing → Payment Methods** and click **Add Payment Method**. Enter your card details in the secure form (powered by Stripe) and click **Save**. Your new card is charged at the next billing cycle. You can also set a card as the default or remove an existing card from this page.
+
+## Usage and invoices
+
+Varo Cloud tracks your resource consumption throughout each billing period. To view your usage breakdown:
+
+1. Go to **Settings → Billing → Usage**.
+2. Select the billing period you want to review from the date picker.
+
+The usage report shows consumption across three dimensions:
+
+- **Deployments** — Total number of deployments triggered in the period.
+- **Build minutes** — Cumulative time spent building your applications.
+- **Bandwidth** — Total data transferred out to end users.
+
+To download a PDF invoice for any completed billing period, go to **Settings → Billing → Invoices**, find the invoice in the list, and click **Download PDF**. Invoices are available for all historical billing periods since your account was created.
+
+## Billing alerts
+
+To avoid unexpected charges, you can configure a spend alert that notifies you when your estimated monthly bill reaches a threshold you define.
+
+To set a billing alert:
+
+1. Go to **Settings → Billing → Alerts**.
+2. Click **Add Alert**.
+3. Enter a spend threshold in your account currency (for example, `$50.00`).
+4. Choose how you want to be notified: email, webhook, or both.
+5. Click **Save Alert**.
+
+When your estimated spend for the current period crosses the threshold, Varo Cloud sends a notification immediately. You can create multiple alerts at different thresholds to get early warnings and final warnings before your budget is fully consumed.

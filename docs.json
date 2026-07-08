@@ -1,0 +1,106 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "luma",
+  "name": "Varo Cloud",
+  "colors": {
+    "primary": "#3B6FE8",
+    "light": "#6B9AF5",
+    "dark": "#2251C5"
+  },
+  "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:support@varocloud.io"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Sign In",
+      "href": "https://app.varocloud.io"
+    }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "core-concepts"
+            ]
+          },
+          {
+            "group": "Setup & Configuration",
+            "pages": [
+              "setup/account",
+              "setup/authentication",
+              "setup/environments",
+              "setup/billing"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/first-deployment",
+              "guides/integrations",
+              "guides/monitoring",
+              "guides/team-management"
+            ]
+          },
+          {
+            "group": "Support",
+            "pages": [
+              "support/faq",
+              "support/troubleshooting"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api-reference/introduction",
+              "api-reference/get-started",
+              "api-reference/authentication",
+              "api-reference/errors"
+            ]
+          },
+          {
+            "group": "Resources",
+            "pages": [
+              "api-reference/resources/projects",
+              "api-reference/resources/deployments",
+              "api-reference/resources/users",
+              "api-reference/resources/integrations"
+            ]
+          },
+          {
+            "group": "Webhooks",
+            "pages": [
+              "api-reference/webhooks"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/varocloud",
+      "github": "https://github.com/varocloud",
+      "linkedin": "https://linkedin.com/company/varocloud"
+    }
+  }
+}

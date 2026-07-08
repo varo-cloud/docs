@@ -1,0 +1,252 @@
+---
+title: "Projects API — Create and Manage Your Cloud Projects"
+sidebarTitle: "Projects"
+description: "REST API endpoints for creating, listing, updating, and deleting Varo Cloud projects. Each project is the top-level container for your deployments."
+---
+
+Projects are the top-level organizational unit in Varo Cloud. Every deployment, environment configuration, and integration belongs to a project. You can use the Projects API to programmatically create and manage projects across your organization, automate provisioning pipelines, and keep your infrastructure in sync with your internal tooling.
+
+Base URL: `https://api.varocloud.io/v1`
+
+All requests require an `Authorization: Bearer YOUR_API_KEY` header.
+
+---
+
+## GET /projects
+
+Returns a paginated list of all projects in your organization.
+
+<ParamField query="per_page" type="integer" default="20">
+  Number of projects to return per page. Maximum value is 100.
+</ParamField>
+
+<ParamField query="cursor" type="string">
+  Pagination cursor returned by a previous response. Pass this value to retrieve the next page of results.
+</ParamField>
+
+<CodeGroup>
+```bash Request
+curl -X GET "https://api.varocloud.io/v1/projects?per_page=20" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```json Response
+{
+  "data": [
+    {
+      "id": "proj_abc123",
+      "name": "storefront-api",
+      "region": "us-east-1",
+      "description": "Customer-facing storefront API service",
+      "status": "active",
+      "created_at": "2024-01-10T08:00:00Z",
+      "updated_at": "2024-01-14T12:30:00Z"
+    },
+    {
+      "id": "proj_def456",
+      "name": "internal-dashboard",
+      "region": "eu-west-1",
+      "description": "Internal analytics dashboard",
+      "status": "archived",
+      "created_at": "2023-11-05T09:15:00Z",
+      "updated_at": "2024-01-02T17:00:00Z"
+    }
+  ],
+  "meta": {
+    "per_page": 20,
+    "next_cursor": "cur_ghi789"
+  }
+}
+```
+</CodeGroup>
+
+<ResponseField name="data" type="array">
+  Array of project objects matching the query.
+</ResponseField>
+
+<ResponseField name="meta.per_page" type="integer">
+  The number of results returned per page.
+</ResponseField>
+
+<ResponseField name="meta.next_cursor" type="string">
+  Cursor value to pass in your next request to retrieve the following page. `null` if there are no further pages.
+</ResponseField>
+
+---
+
+## POST /projects
+
+Creates a new project in your organization.
+
+<ParamField body="name" type="string" required>
+  A unique, human-readable name for the project. Must be between 3 and 64 characters.
+</ParamField>
+
+<ParamField body="region" type="string" required>
+  The cloud region in which to create the project (e.g. `us-east-1`, `eu-west-1`, `ap-southeast-2`).
+</ParamField>
+
+<ParamField body="description" type="string">
+  An optional plain-text description of the project's purpose. Maximum 255 characters.
+</ParamField>
+
+<CodeGroup>
+```bash Request
+curl -X POST "https://api.varocloud.io/v1/projects" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "payments-service",
+    "region": "us-east-1",
+    "description": "Handles all payment processing workflows"
+  }'
+```
+
+```json Response
+{
+  "id": "proj_jkl012",
+  "name": "payments-service",
+  "region": "us-east-1",
+  "description": "Handles all payment processing workflows",
+  "status": "active",
+  "created_at": "2024-01-15T10:00:00Z",
+  "updated_at": "2024-01-15T10:00:00Z"
+}
+```
+</CodeGroup>
+
+<ResponseField name="id" type="string">
+  The unique identifier for the newly created project.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Initial status of the project. Always `active` on creation.
+</ResponseField>
+
+---
+
+## GET /projects/{id}
+
+Retrieves a single project by its ID.
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the project to retrieve.
+</ParamField>
+
+<CodeGroup>
+```bash Request
+curl -X GET "https://api.varocloud.io/v1/projects/proj_abc123" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```json Response
+{
+  "id": "proj_abc123",
+  "name": "storefront-api",
+  "region": "us-east-1",
+  "description": "Customer-facing storefront API service",
+  "status": "active",
+  "created_at": "2024-01-10T08:00:00Z",
+  "updated_at": "2024-01-14T12:30:00Z"
+}
+```
+</CodeGroup>
+
+---
+
+## PUT /projects/{id}
+
+Updates the name or description of an existing project.
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the project to update.
+</ParamField>
+
+<ParamField body="name" type="string">
+  A new name for the project. Must be between 3 and 64 characters.
+</ParamField>
+
+<ParamField body="description" type="string">
+  A new description for the project. Maximum 255 characters. Pass an empty string to clear the existing description.
+</ParamField>
+
+<CodeGroup>
+```bash Request
+curl -X PUT "https://api.varocloud.io/v1/projects/proj_abc123" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "storefront-api-v2",
+    "description": "Refactored storefront API with improved caching"
+  }'
+```
+
+```json Response
+{
+  "id": "proj_abc123",
+  "name": "storefront-api-v2",
+  "region": "us-east-1",
+  "description": "Refactored storefront API with improved caching",
+  "status": "active",
+  "created_at": "2024-01-10T08:00:00Z",
+  "updated_at": "2024-01-15T11:45:00Z"
+}
+```
+</CodeGroup>
+
+---
+
+## DELETE /projects/{id}
+
+Permanently deletes a project and all of its associated resources.
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the project to delete.
+</ParamField>
+
+<Warning>
+  Deleting a project **permanently removes all deployments, environment variables, and configuration** associated with it. This action cannot be undone. Ensure you have backed up any critical data before proceeding.
+</Warning>
+
+<CodeGroup>
+```bash Request
+curl -X DELETE "https://api.varocloud.io/v1/projects/proj_abc123" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+A successful deletion returns `204 No Content` with an empty response body.
+
+---
+
+## Project Object
+
+The following fields are present on every project object returned by the API.
+
+<ResponseField name="id" type="string">
+  Unique identifier for the project, prefixed with `proj_`.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  The human-readable name of the project.
+</ResponseField>
+
+<ResponseField name="region" type="string">
+  The cloud region where the project is hosted (e.g. `us-east-1`).
+</ResponseField>
+
+<ResponseField name="description" type="string">
+  Optional description of the project. May be `null` if not set.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current state of the project. One of `active` or `archived`.
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 datetime string representing when the project was created.
+</ResponseField>
+
+<ResponseField name="updated_at" type="string">
+  ISO 8601 datetime string representing when the project was last modified.
+</ResponseField>

@@ -1,0 +1,75 @@
+---
+title: "Set Up Your Varo Cloud Account and Organization"
+sidebarTitle: "Account"
+description: "Configure your Varo Cloud account, organization profile, and notification preferences. Invite teammates and manage organization-level settings."
+---
+
+Getting started with Varo Cloud takes just a few minutes. Once your account is created, you can configure your organization profile, invite teammates, and tailor notification preferences so your team stays informed about deployments, billing events, and activity across your projects.
+
+## Create your account
+
+To create your Varo Cloud account, follow these steps:
+
+1. Navigate to [https://app.varocloud.io](https://app.varocloud.io) in your browser.
+2. Click **Sign Up** on the homepage.
+3. Enter your email address and choose a secure password, then click **Create Account**.
+4. Check your inbox for a verification email from Varo Cloud and click the confirmation link to activate your account.
+
+Once verified, you are taken directly to your Varo Cloud dashboard and placed into your personal organization.
+
+## Organization settings
+
+After signing up, Varo Cloud automatically creates a personal organization for you. You can rename this organization, set a URL-friendly slug, and upload a logo to reflect your team or company branding. To manage these settings, navigate to **Settings → Organization** from the dashboard sidebar.
+
+The following fields are configurable from the Organization settings page:
+
+| Field | Description |
+|---|---|
+| **Name** | The display name shown across the dashboard and team invites. |
+| **Slug** | A unique, URL-safe identifier for your organization (e.g., `acme-corp`). |
+| **Contact Email** | The primary email address used for billing and account-level notices. |
+| **Timezone** | Sets the timezone used for deployment logs, usage reports, and scheduled tasks. |
+
+## Notification preferences
+
+Varo Cloud lets you control exactly which events trigger notifications and how those notifications are delivered. To configure your preferences, go to **Settings → Notifications**.
+
+<Tabs>
+  <Tab title="Email Notifications">
+    Email notifications are sent directly to your account email address or a team distribution list. You can enable or disable notifications for the following event categories:
+
+    - **Deployment events** — Build started, deployment succeeded, deployment failed, rollback triggered.
+    - **Billing alerts** — Spend threshold reached, payment failed, invoice available.
+    - **Team activity** — Member invited, member removed, role changed.
+
+    Toggle each category on or off using the switches on the Email Notifications tab. Changes are saved automatically.
+  </Tab>
+  <Tab title="Webhook Notifications">
+    Webhook notifications allow Varo Cloud to send a JSON payload to an endpoint of your choice whenever a subscribed event occurs. This is useful for integrating with tools like Slack, PagerDuty, or your own internal monitoring systems.
+
+    To add a webhook endpoint:
+
+    1. Go to **Settings → Notifications → Webhook Notifications**.
+    2. Click **Add Endpoint** and enter your target URL.
+    3. Select the event types you want to subscribe to.
+    4. Click **Save**. Varo Cloud sends a test ping to verify the endpoint is reachable.
+
+    Each webhook delivery includes an `X-Varo-Signature` header that you can use to verify the authenticity of the payload on your server.
+  </Tab>
+</Tabs>
+
+## Account security
+
+Keeping your account secure protects both your projects and your organization's data. You can change your password and enable two-factor authentication (2FA) from **Settings → Security**.
+
+To change your password, click **Change Password**, enter your current password, then enter and confirm your new password.
+
+To enable 2FA, click **Enable Two-Factor Authentication** and follow the prompts to link an authenticator app such as Google Authenticator or Authy. You will be asked to scan a QR code and confirm a one-time code before 2FA is fully activated.
+
+<Warning>
+  Enable two-factor authentication to protect your account and API keys. If your credentials are compromised, 2FA prevents unauthorized access even when the password is known.
+</Warning>
+
+<Tip>
+  Once your account is secured, the next step is generating an API key so you can authenticate programmatic requests. See [Authentication](/setup/authentication) for a step-by-step guide.
+</Tip>

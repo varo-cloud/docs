@@ -1,0 +1,351 @@
+---
+title: "Deployments API — Trigger and Manage Deployments"
+sidebarTitle: "Deployments"
+description: "REST API endpoints for creating, listing, monitoring, rolling back, and cancelling deployments in Varo Cloud projects and environments."
+---
+
+The Deployments API gives you full programmatic control over the deployment lifecycle in Varo Cloud. You can trigger deployments from a Git repository or a container image, monitor their progress in real time via log streaming, roll back to a previous stable version, or cancel a deployment that is still queued or building. Every deployment belongs to a project and targets a named environment such as `production`, `staging`, or `preview`.
+
+Base URL: `https://api.varocloud.io/v1`
+
+All requests require an `Authorization: Bearer YOUR_API_KEY` header.
+
+---
+
+## GET /deployments
+
+Returns a paginated list of deployments, optionally filtered by project, environment, or status.
+
+<ParamField query="project_id" type="string">
+  Filter deployments to a specific project by its ID.
+</ParamField>
+
+<ParamField query="environment" type="string">
+  Filter by target environment name (e.g. `production`, `staging`).
+</ParamField>
+
+<ParamField query="status" type="string">
+  Filter by deployment status. One of `queued`, `building`, `deploying`, `active`, `failed`, `cancelled`, or `rolled_back`.
+</ParamField>
+
+<ParamField query="per_page" type="integer" default="20">
+  Number of results to return per page. Maximum value is 100.
+</ParamField>
+
+<ParamField query="cursor" type="string">
+  Pagination cursor from a previous response to retrieve the next page.
+</ParamField>
+
+<CodeGroup>
+```bash Request
+curl -X GET "https://api.varocloud.io/v1/deployments?project_id=proj_abc123&environment=production&per_page=20" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```json Response
+{
+  "data": [
+    {
+      "id": "dep_xyz789",
+      "project_id": "proj_abc123",
+      "environment": "production",
+      "status": "active",
+      "version": "v1.2.3",
+      "created_at": "2024-01-15T10:00:00Z",
+      "updated_at": "2024-01-15T10:08:00Z",
+      "completed_at": "2024-01-15T10:08:00Z"
+    }
+  ],
+  "meta": {
+    "per_page": 20,
+    "next_cursor": null
+  }
+}
+```
+</CodeGroup>
+
+---
+
+## POST /deployments
+
+Creates and queues a new deployment for the specified project and environment.
+
+<ParamField body="project_id" type="string" required>
+  The ID of the project to deploy to.
+</ParamField>
+
+<ParamField body="environment" type="string" required>
+  The target environment name, such as `production`, `staging`, or `preview`.
+</ParamField>
+
+<ParamField body="source" type="object" required>
+  Describes the deployment source. Must include a `type` field of either `git` or `image`, plus the corresponding fields described below.
+</ParamField>
+
+<ParamField body="source.type" type="string" required>
+  The source type. Use `git` to deploy from a repository branch or tag, or `image` to deploy a pre-built container image.
+</ParamField>
+
+<ParamField body="source.repo" type="string">
+  Required when `source.type` is `git`. The repository path in `owner/repo` format.
+</ParamField>
+
+<ParamField body="source.branch" type="string">
+  The branch to deploy. Used when `source.type` is `git`.
+</ParamField>
+
+<ParamField body="source.tag" type="string">
+  A specific tag to deploy. Used when `source.type` is `git`. Takes precedence over `branch` when both are provided.
+</ParamField>
+
+<ParamField body="source.image_url" type="string">
+  Required when `source.type` is `image`. The full URL of the container image to deploy, including tag.
+</ParamField>
+
+<CodeGroup>
+```bash Request
+curl -X POST "https://api.varocloud.io/v1/deployments" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "project_id": "proj_abc123",
+    "environment": "production",
+    "source": {
+      "type": "git",
+      "repo": "acme-corp/storefront-api",
+      "branch": "main"
+    }
+  }'
+```
+
+```json Response
+{
+  "id": "dep_mno345",
+  "project_id": "proj_abc123",
+  "environment": "production",
+  "status": "queued",
+  "version": null,
+  "source": {
+    "type": "git",
+    "repo": "acme-corp/storefront-api",
+    "branch": "main",
+    "tag": null,
+    "image_url": null
+  },
+  "created_at": "2024-01-15T10:20:00Z",
+  "updated_at": "2024-01-15T10:20:00Z",
+  "completed_at": null
+}
+```
+</CodeGroup>
+
+---
+
+## GET /deployments/{id}
+
+Retrieves the full details of a single deployment.
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the deployment.
+</ParamField>
+
+<CodeGroup>
+```bash Request
+curl -X GET "https://api.varocloud.io/v1/deployments/dep_xyz789" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```json Response
+{
+  "id": "dep_xyz789",
+  "project_id": "proj_abc123",
+  "environment": "production",
+  "status": "active",
+  "version": "v1.2.3",
+  "source": {
+    "type": "git",
+    "repo": "acme-corp/storefront-api",
+    "branch": "main",
+    "tag": "v1.2.3",
+    "image_url": null
+  },
+  "created_at": "2024-01-15T10:00:00Z",
+  "updated_at": "2024-01-15T10:08:00Z",
+  "completed_at": "2024-01-15T10:08:00Z"
+}
+```
+</CodeGroup>
+
+---
+
+## GET /deployments/{id}/logs
+
+Returns an array of log entries generated during the deployment build and rollout process. This endpoint is useful for inspecting build output, error messages, and runtime startup logs.
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the deployment whose logs you want to retrieve.
+</ParamField>
+
+<CodeGroup>
+```bash Request
+curl -X GET "https://api.varocloud.io/v1/deployments/dep_xyz789/logs" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```json Response
+{
+  "data": [
+    {
+      "timestamp": "2024-01-15T10:01:00Z",
+      "level": "info",
+      "message": "Build started for commit a3f9c12"
+    },
+    {
+      "timestamp": "2024-01-15T10:03:22Z",
+      "level": "info",
+      "message": "Dependencies installed successfully"
+    },
+    {
+      "timestamp": "2024-01-15T10:05:45Z",
+      "level": "info",
+      "message": "Container image built and pushed"
+    },
+    {
+      "timestamp": "2024-01-15T10:07:10Z",
+      "level": "info",
+      "message": "Health check passed — deployment marked active"
+    }
+  ]
+}
+```
+</CodeGroup>
+
+<ResponseField name="data[].timestamp" type="string">
+  ISO 8601 datetime string for when the log entry was emitted.
+</ResponseField>
+
+<ResponseField name="data[].level" type="string">
+  Severity level of the log entry. One of `info`, `warn`, or `error`.
+</ResponseField>
+
+<ResponseField name="data[].message" type="string">
+  The log message text.
+</ResponseField>
+
+---
+
+## POST /deployments/{id}/rollback
+
+Rolls back the specified deployment by creating a new deployment targeting the most recent previously active version in the same environment.
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the deployment to roll back from.
+</ParamField>
+
+<Note>
+  Rollback creates a **new deployment** pointing to the previous stable version. It does not modify or revert the original deployment record. You can inspect the new deployment object to track the rollback's progress through the normal deployment lifecycle.
+</Note>
+
+<CodeGroup>
+```bash Request
+curl -X POST "https://api.varocloud.io/v1/deployments/dep_xyz789/rollback" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```json Response
+{
+  "id": "dep_pqr678",
+  "project_id": "proj_abc123",
+  "environment": "production",
+  "status": "queued",
+  "version": "v1.2.2",
+  "source": {
+    "type": "git",
+    "repo": "acme-corp/storefront-api",
+    "branch": null,
+    "tag": "v1.2.2",
+    "image_url": null
+  },
+  "created_at": "2024-01-15T11:00:00Z",
+  "updated_at": "2024-01-15T11:00:00Z",
+  "completed_at": null
+}
+```
+</CodeGroup>
+
+---
+
+## POST /deployments/{id}/cancel
+
+Cancels a deployment that is currently in the `queued` or `building` state.
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the deployment to cancel.
+</ParamField>
+
+<CodeGroup>
+```bash Request
+curl -X POST "https://api.varocloud.io/v1/deployments/dep_mno345/cancel" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```json Response
+{
+  "id": "dep_mno345",
+  "project_id": "proj_abc123",
+  "environment": "production",
+  "status": "cancelled",
+  "version": null,
+  "source": {
+    "type": "git",
+    "repo": "acme-corp/storefront-api",
+    "branch": "main",
+    "tag": null,
+    "image_url": null
+  },
+  "created_at": "2024-01-15T10:20:00Z",
+  "updated_at": "2024-01-15T10:21:30Z",
+  "completed_at": null
+}
+```
+</CodeGroup>
+
+---
+
+## Deployment Object
+
+<ResponseField name="id" type="string">
+  Unique identifier for the deployment, prefixed with `dep_`.
+</ResponseField>
+
+<ResponseField name="project_id" type="string">
+  The ID of the project this deployment belongs to.
+</ResponseField>
+
+<ResponseField name="environment" type="string">
+  The target environment name (e.g. `production`, `staging`).
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current lifecycle status of the deployment. One of `queued`, `building`, `deploying`, `active`, `failed`, `cancelled`, or `rolled_back`.
+</ResponseField>
+
+<ResponseField name="source" type="object">
+  An object describing the deployment source, including `type`, `repo`, `branch`, `tag`, and `image_url`.
+</ResponseField>
+
+<ResponseField name="version" type="string">
+  The resolved version string (e.g. a Git tag or image digest). `null` while the deployment is still queued or building.
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 datetime string for when the deployment was created.
+</ResponseField>
+
+<ResponseField name="updated_at" type="string">
+  ISO 8601 datetime string for when the deployment was last updated.
+</ResponseField>
+
+<ResponseField name="completed_at" type="string">
+  ISO 8601 datetime string for when the deployment reached a terminal state (`active`, `failed`, `cancelled`, or `rolled_back`). `null` if the deployment is still in progress.
+</ResponseField>

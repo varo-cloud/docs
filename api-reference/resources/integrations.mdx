@@ -1,0 +1,235 @@
+---
+title: "Integrations API — Connect and Manage External Services"
+sidebarTitle: "Integrations"
+description: "REST API endpoints for listing, creating, and removing Varo Cloud integrations with GitHub, Slack, Datadog, and other external services."
+---
+
+Integrations connect your Varo Cloud organization to the external tools your team already uses. Once an integration is in place, Varo Cloud can automatically trigger deployments from Git pushes, post deployment status updates to Slack, forward metrics and alerts to Datadog, or communicate with any custom HTTPS endpoint you specify. You can manage all integrations programmatically through the Integrations API.
+
+Base URL: `https://api.varocloud.io/v1`
+
+All requests require an `Authorization: Bearer YOUR_API_KEY` header.
+
+---
+
+## GET /integrations
+
+Returns a list of all integrations configured in your organization.
+
+<CodeGroup>
+```bash Request
+curl -X GET "https://api.varocloud.io/v1/integrations" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```json Response
+{
+  "data": [
+    {
+      "id": "int_aaa111",
+      "type": "github",
+      "name": "GitHub — acme-corp/storefront-api",
+      "status": "active",
+      "created_at": "2024-01-10T09:00:00Z"
+    },
+    {
+      "id": "int_bbb222",
+      "type": "slack",
+      "name": "Slack — #deployments",
+      "status": "active",
+      "created_at": "2024-01-11T14:00:00Z"
+    },
+    {
+      "id": "int_ccc333",
+      "type": "datadog",
+      "name": "Datadog — production metrics",
+      "status": "inactive",
+      "created_at": "2023-12-01T10:30:00Z"
+    }
+  ]
+}
+```
+</CodeGroup>
+
+<ResponseField name="data[].id" type="string">
+  Unique identifier for the integration, prefixed with `int_`.
+</ResponseField>
+
+<ResponseField name="data[].type" type="string">
+  The integration type. One of `github`, `slack`, `datadog`, or `custom`.
+</ResponseField>
+
+<ResponseField name="data[].name" type="string">
+  A human-readable display name for the integration, typically auto-generated from the configuration.
+</ResponseField>
+
+<ResponseField name="data[].status" type="string">
+  The current state of the integration. One of `active` or `inactive`.
+</ResponseField>
+
+<ResponseField name="data[].created_at" type="string">
+  ISO 8601 datetime string for when the integration was created.
+</ResponseField>
+
+---
+
+## POST /integrations
+
+Creates a new integration. The structure of the `config` object varies by integration type — see [Integration Types](#integration-types) below for type-specific fields.
+
+<ParamField body="type" type="string" required>
+  The integration type to create. One of `github`, `slack`, `datadog`, or `custom`.
+</ParamField>
+
+<ParamField body="config" type="object" required>
+  A type-specific configuration object. Refer to the Integration Types section for the required and optional fields for each type.
+</ParamField>
+
+The example below creates a GitHub integration that watches the `main` branch of a repository and triggers deployments to the `production` environment:
+
+<CodeGroup>
+```bash Request
+curl -X POST "https://api.varocloud.io/v1/integrations" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "github",
+    "config": {
+      "repo": "acme-corp/storefront-api",
+      "branch": "main",
+      "environment": "production"
+    }
+  }'
+```
+
+```json Response
+{
+  "id": "int_ddd444",
+  "type": "github",
+  "name": "GitHub — acme-corp/storefront-api",
+  "status": "active",
+  "config": {
+    "repo": "acme-corp/storefront-api",
+    "branch": "main",
+    "environment": "production"
+  },
+  "created_at": "2024-01-15T10:00:00Z"
+}
+```
+</CodeGroup>
+
+<ResponseField name="id" type="string">
+  Unique identifier for the newly created integration.
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  The integration type as provided in the request.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Auto-generated display name for the integration.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Initial status of the integration. `active` if the configuration was validated successfully.
+</ResponseField>
+
+<ResponseField name="config" type="object">
+  The configuration object as stored. Sensitive values such as tokens are redacted in responses.
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 datetime string for when the integration was created.
+</ResponseField>
+
+---
+
+## GET /integrations/{id}
+
+Retrieves the full details of a single integration, including its configuration.
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the integration to retrieve.
+</ParamField>
+
+<CodeGroup>
+```bash Request
+curl -X GET "https://api.varocloud.io/v1/integrations/int_aaa111" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```json Response
+{
+  "id": "int_aaa111",
+  "type": "github",
+  "name": "GitHub — acme-corp/storefront-api",
+  "status": "active",
+  "config": {
+    "repo": "acme-corp/storefront-api",
+    "branch": "main",
+    "environment": "production"
+  },
+  "created_at": "2024-01-10T09:00:00Z"
+}
+```
+</CodeGroup>
+
+---
+
+## DELETE /integrations/{id}
+
+Permanently removes an integration from your organization. Varo Cloud will immediately stop sending events to or receiving events from the external service.
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the integration to remove.
+</ParamField>
+
+<CodeGroup>
+```bash Request
+curl -X DELETE "https://api.varocloud.io/v1/integrations/int_ccc333" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+A successful deletion returns `204 No Content` with an empty response body.
+
+---
+
+## Integration Object
+
+<ResponseField name="id" type="string">
+  Unique identifier for the integration, prefixed with `int_`.
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  The integration type. One of `github`, `slack`, `datadog`, or `custom`.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Human-readable display name, typically derived from the `config` fields.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current operational status of the integration. One of `active` or `inactive`.
+</ResponseField>
+
+<ResponseField name="config" type="object">
+  The integration's configuration object. Sensitive credentials are redacted in all API responses.
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 datetime string for when the integration was created.
+</ResponseField>
+
+---
+
+## Integration Types
+
+The following integration types are supported. Each type has its own `config` schema.
+
+| Type | Description | Key `config` fields |
+|---|---|---|
+| `github` | Triggers automatic deployments when commits or tags are pushed to a specified repository branch. Requires a connected GitHub App installation. | `repo` (string), `branch` (string), `environment` (string) |
+| `slack` | Posts deployment and project event notifications to a Slack channel via an incoming webhook URL. | `webhook_url` (string), `channel` (string), `events` (array of event names) |
+| `datadog` | Forwards deployment events and performance metrics to your Datadog account for monitoring and alerting. | `api_key` (string), `site` (string, e.g. `datadoghq.com`), `service` (string) |
+| `custom` | Sends signed HTTP POST payloads to any HTTPS endpoint you control. Useful for integrating with internal tools or services not natively supported. | `url` (string), `secret` (string, for signature verification), `events` (array of event names) |

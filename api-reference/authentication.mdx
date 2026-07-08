@@ -1,0 +1,77 @@
+---
+title: "Authenticating Your Requests to the Varo Cloud API"
+sidebarTitle: "Authentication"
+description: "All Varo Cloud API requests require a Bearer token in the Authorization header. Learn how to generate, use, and rotate API keys for the REST API."
+---
+
+Every request to the Varo Cloud API must include a valid API key. Requests made without a key, or with a key that has been revoked, will receive a `401 Unauthorized` response and will not be processed.
+
+## Generating an API Key
+
+API keys are created from the Varo Cloud dashboard. For full step-by-step instructions, see the [Authentication setup guide](/setup/authentication). In summary:
+
+1. Open **Settings** in the left sidebar of your dashboard.
+2. Navigate to **API Keys** and click **New Key**.
+3. Give the key a descriptive name (for example, `production-deploy-bot`).
+4. Copy the key immediately — it is only shown once at creation time.
+
+Store the key somewhere secure before closing the dialog. If you lose it, you will need to revoke the old key and generate a new one.
+
+## Passing the Key
+
+Include your API key as a Bearer token in the `Authorization` header of every request:
+
+```text
+Authorization: Bearer YOUR_API_KEY
+```
+
+<CodeGroup>
+
+```bash cURL
+curl https://api.varocloud.io/v1/projects \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+```javascript JavaScript (fetch)
+const response = await fetch('https://api.varocloud.io/v1/projects', {
+  method: 'GET',
+  headers: {
+    'Authorization': `Bearer ${process.env.VARO_API_KEY}`,
+    'Content-Type': 'application/json'
+  }
+});
+
+const { data } = await response.json();
+console.log(data);
+```
+
+</CodeGroup>
+
+## Security Best Practices
+
+<Note>
+  Treat your API key like a password. Anyone who holds it can take actions on your account up to the key's permission level.
+
+  - **Never commit API keys to source control.** Even in private repositories, keys can be exposed through history, forks, or misconfigured access.
+  - **Use environment variables or a secrets manager** such as AWS Secrets Manager, HashiCorp Vault, or your CI/CD platform's built-in secret store.
+  - **Create a separate key for each application and CI/CD pipeline** so you can revoke a single key without disrupting unrelated services.
+  - **Set calendar reminders to rotate keys every 90 days** to limit the blast radius of any undetected exposure.
+</Note>
+
+## Token Expiration
+
+API keys issued by Varo Cloud do not expire automatically. A key remains valid indefinitely until you explicitly revoke it from **Settings → API Keys**. Revocation takes effect immediately — any in-flight request using a revoked key will be rejected.
+
+Because keys do not expire on their own, it is especially important to follow the rotation practices described above. You can revoke and replace a key at any time without downtime, provided you update your application's environment variables before revoking the old key.
+
+## Error Responses
+
+If authentication fails, the API returns one of the following HTTP status codes:
+
+| Status Code | Meaning |
+|---|---|
+| `401 Unauthorized` | The `Authorization` header is missing, malformed, or contains a revoked key. Check that you are passing the header correctly and that the key has not been deleted. |
+| `403 Forbidden` | The API key is valid and recognized, but it does not have permission to perform the requested action. Check that the key has the correct role or scope assigned in your dashboard settings. |
+
+For a full reference of all error codes and response shapes, see the [Errors](/api-reference/errors) page.

@@ -1,0 +1,134 @@
+---
+title: "Varo Cloud API Error Codes, Formats, and Retry Guide"
+sidebarTitle: "Errors"
+description: "Reference for all Varo Cloud API error response codes. Includes status codes, error objects, validation errors, and retry guidance."
+---
+
+When a request fails, the Varo Cloud API returns a JSON error object with a machine-readable `code` and a human-readable `message` so your application can handle failures programmatically and surface clear feedback to users.
+
+## Error Response Format
+
+All error responses share the same envelope structure. The top-level `error` object always contains `code`, `message`, and `request_id`. For validation failures, a `details` array is also included with field-level information:
+
+```json
+{
+  "error": {
+    "code": "validation_error",
+    "message": "The request body contains invalid fields.",
+    "details": [
+      {
+        "field": "environment",
+        "issue": "must be one of: development, staging, production"
+      }
+    ],
+    "request_id": "req_abc123"
+  }
+}
+```
+
+Include the `request_id` value when contacting Varo Cloud support — it allows the support team to trace and resolve your request quickly.
+
+## HTTP Status Codes
+
+The API uses standard HTTP status codes to indicate the outcome of every request.
+
+| Status | Meaning |
+|---|---|
+| `200 OK` | The request succeeded and the response body contains the requested data. |
+| `201 Created` | A new resource was successfully created. The response body contains the created resource. |
+| `204 No Content` | The request succeeded but there is no response body (for example, a successful `DELETE`). |
+| `400 Bad Request` | The request was malformed — for example, invalid JSON syntax or a missing required header. |
+| `401 Unauthorized` | The API key is missing, invalid, or has been revoked. |
+| `403 Forbidden` | The API key is valid but does not have permission to perform this action. |
+| `404 Not Found` | The requested resource does not exist or you do not have access to it. |
+| `409 Conflict` | The request conflicts with the current state — for example, creating a resource with a name that already exists. |
+| `422 Unprocessable Entity` | The request was well-formed but failed validation. Check the `error.details` array for field-level issues. |
+| `429 Too Many Requests` | You have exceeded the rate limit for your API key. |
+| `500 Internal Server Error` | An unexpected error occurred on Varo Cloud's servers. This is not caused by your request. |
+| `503 Service Unavailable` | Varo Cloud is temporarily unavailable, typically due to planned maintenance or an active incident. |
+
+## Error Codes
+
+The `error.code` field contains a stable, machine-readable string that identifies the type of failure. Use this value in your error-handling logic rather than parsing the human-readable `message`.
+
+| Code | Typical HTTP Status | Description |
+|---|---|---|
+| `unauthorized` | 401 | API key is missing or invalid. |
+| `forbidden` | 403 | API key is valid but lacks the required permission. |
+| `not_found` | 404 | The requested resource does not exist. |
+| `invalid_request` | 400 | The request is malformed or missing required parameters. |
+| `validation_error` | 422 | One or more fields in the request body failed validation. |
+| `conflict` | 409 | The operation conflicts with existing data or resource state. |
+| `rate_limited` | 429 | The API key has exceeded its request quota. |
+| `server_error` | 500 | An unexpected internal error occurred. |
+| `service_unavailable` | 503 | The service is temporarily offline or undergoing maintenance. |
+
+## Handling Validation Errors
+
+When the API returns a `validation_error`, the `error.details` array contains one entry per invalid field, each with a `field` name and an `issue` description. Iterate over `details` to surface actionable feedback:
+
+```javascript
+const res = await fetch('https://api.varocloud.io/v1/deployments', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${apiKey}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(payload)
+});
+
+if (!res.ok) {
+  const { error } = await res.json();
+
+  if (error.code === 'validation_error') {
+    error.details.forEach(d => console.error(`${d.field}: ${d.issue}`));
+  }
+
+  throw new Error(error.message);
+}
+```
+
+This pattern lets you map `error.details` directly onto form field errors or structured log entries without relying on string-matching the human-readable message.
+
+## Retries and Rate Limiting
+
+<Note>
+  On a `429 Too Many Requests` response, do not retry immediately. Read the `X-RateLimit-Reset` header, which contains a Unix timestamp indicating when your quota resets, and wait until that time before sending another request.
+
+  On `500 Internal Server Error` or `503 Service Unavailable` responses, use **exponential backoff** starting at 1 second. These errors are typically transient and resolve quickly, but hammering the API during an incident will delay recovery and exhaust your rate limit.
+</Note>
+
+The following snippet demonstrates a simple retry helper with exponential backoff for server-side errors and respect for the rate-limit reset time:
+
+```javascript
+async function fetchWithRetry(url, options, maxRetries = 4) {
+  let delay = 1000; // start at 1 second
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const res = await fetch(url, options);
+
+    // Success or a client error that won't benefit from a retry
+    if (res.ok || (res.status >= 400 && res.status < 500 && res.status !== 429)) {
+      return res;
+    }
+
+    if (res.status === 429) {
+      // Respect the rate-limit reset timestamp
+      const resetAt = res.headers.get('X-RateLimit-Reset');
+      const waitMs = resetAt
+        ? Math.max(0, Number(resetAt) * 1000 - Date.now())
+        : delay;
+      console.warn(`Rate limited. Retrying after ${waitMs}ms.`);
+      await new Promise(resolve => setTimeout(resolve, waitMs));
+    } else {
+      // 500 / 503 — exponential backoff with jitter
+      const jitter = Math.random() * 500;
+      console.warn(`Server error ${res.status}. Retrying in ${delay + jitter}ms.`);
+      await new Promise(resolve => setTimeout(resolve, delay + jitter));
+      delay *= 2; // double the delay for the next attempt
+    }
+  }
+
+  throw new Error(`Request failed after ${maxRetries} retries: ${url}`);
+}
+```

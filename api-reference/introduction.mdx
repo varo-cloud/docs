@@ -1,0 +1,110 @@
+---
+title: "Varo Cloud REST API Reference: Overview and Concepts"
+sidebarTitle: "Overview"
+description: "The Varo Cloud REST API lets you manage projects, environments, deployments, and team members programmatically. Base URL and versioning explained."
+---
+
+The Varo Cloud REST API gives you programmatic access to everything available in the dashboard — create and configure projects, trigger deployments, manage team members, and automate your entire cloud workflow from your own tools and scripts.
+
+## Base URL
+
+All API requests are made over HTTPS to the following base URL:
+
+```text
+https://api.varocloud.io/v1
+```
+
+Every endpoint path is appended directly to this base. Here is a minimal example that lists your projects:
+
+```bash
+curl https://api.varocloud.io/v1/projects \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+## Versioning
+
+The current API version is `v1`, reflected in the base URL path. When Varo Cloud introduces changes that would break existing integrations — such as removing a field, changing a field's type, or altering existing behavior — a new version prefix (e.g., `/v2`) will be released and the previous version will continue to work during a deprecation window.
+
+Non-breaking additions, including new optional fields on existing responses, new query parameters, and entirely new endpoints, are rolled out without a version bump. You should write your integration to ignore unknown fields so these additions do not affect your code.
+
+## Request Format
+
+All request bodies must be sent as JSON. Include the `Content-Type: application/json` header on every request that has a body, such as `POST`, `PUT`, and `PATCH` requests. All responses from the API are also JSON.
+
+## Response Format
+
+Successful responses are wrapped in a standard envelope. A single-resource response looks like this:
+
+```json
+{
+  "data": { "..." },
+  "meta": {
+    "request_id": "req_abc123",
+    "timestamp": "2024-01-15T10:30:00Z"
+  }
+}
+```
+
+When an endpoint returns a list of resources, the envelope includes a `pagination` object alongside `data`:
+
+```json
+{
+  "data": ["..."],
+  "pagination": {
+    "total": 42,
+    "page": 1,
+    "per_page": 20,
+    "next_cursor": "cursor_xyz"
+  },
+  "meta": { "request_id": "req_abc123" }
+}
+```
+
+The `meta.request_id` field is present on every response. Include it when contacting support so issues can be traced quickly.
+
+## Pagination
+
+List endpoints use cursor-based pagination. Rather than requesting results by page number, you pass the `next_cursor` value returned in the previous response as the `cursor` query parameter of your next request. This approach stays consistent even when records are added or removed between requests.
+
+Use the `per_page` parameter to control how many items are returned per page (maximum 100). If `next_cursor` is absent from the response, you have reached the last page.
+
+```bash
+curl "https://api.varocloud.io/v1/deployments?per_page=50&cursor=cursor_xyz" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+## Rate Limits
+
+<Note>
+  The default rate limit is **1,000 requests per 10-minute window** per API key. If you need a higher limit for production workloads, contact Varo Cloud support to discuss an increased quota.
+</Note>
+
+Every API response includes the following headers so you can monitor your usage:
+
+| Header | Description |
+|---|---|
+| `X-RateLimit-Limit` | Total requests allowed in the current window |
+| `X-RateLimit-Remaining` | Requests remaining in the current window |
+| `X-RateLimit-Reset` | Unix timestamp when the current window resets |
+
+When you exceed the limit, the API returns a `429 Too Many Requests` response. Wait until the `X-RateLimit-Reset` time before retrying. See the [Errors](/api-reference/errors) page for retry guidance.
+
+## Available Resources
+
+<CardGroup cols={2}>
+  <Card title="Projects" icon="folder" href="/api-reference/resources/projects">
+    Create, configure, and delete projects. Manage project-level settings and environment variables.
+  </Card>
+  <Card title="Deployments" icon="rocket" href="/api-reference/resources/deployments">
+    Trigger and monitor deployments, roll back to previous versions, and inspect deployment logs.
+  </Card>
+  <Card title="Users" icon="users" href="/api-reference/resources/users">
+    Invite team members, update roles, and remove users from your organization.
+  </Card>
+  <Card title="Integrations" icon="plug" href="/api-reference/resources/integrations">
+    Connect third-party services and manage credentials for your integrated tools.
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/api-reference/webhooks">
+    Register and manage webhook endpoints to receive real-time event notifications.
+  </Card>
+</CardGroup>

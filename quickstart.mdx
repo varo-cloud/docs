@@ -1,0 +1,83 @@
+---
+title: "Quickstart: Deploy Your First Application on Varo Cloud"
+sidebarTitle: "Quickstart"
+description: "Create your first Varo Cloud project, generate an API key, and trigger your first deployment in under 10 minutes with this step-by-step guide."
+---
+
+By the end of this guide you will have a Varo Cloud account, a live project, a working API key, and a successful deployment under your belt. Every step is designed to be completed in sequence — the whole thing should take less than 10 minutes, even if this is your first time using the platform.
+
+<Note>
+  **Before you begin, make sure you have:**
+  - A Varo Cloud account. If you don't have one yet, sign up for free at [app.varocloud.io](https://app.varocloud.io).
+  - A working terminal with `curl` available if you want to follow along with the API examples.
+</Note>
+
+<Steps>
+  <Step title="Create your account">
+    Navigate to [app.varocloud.io](https://app.varocloud.io) and click **Sign Up**. Enter your email address and choose a password, then check your inbox for a verification email. Click the confirmation link to activate your account and land on the Varo Cloud dashboard for the first time.
+  </Step>
+
+  <Step title="Create a project">
+    From the dashboard, click **New Project** in the top-right corner. Give your project a name that reflects your application or service — for example, `my-first-app`. Next, choose the deployment region closest to your primary users, then click **Create**. Varo Cloud provisions your project in seconds and redirects you to its overview page.
+  </Step>
+
+  <Step title="Generate an API key">
+    Open **Settings** from the left-hand navigation, then select **API Keys**. Click **New Key**, give it a descriptive label (for example, `local-dev`), and click **Generate**. Copy the key immediately and store it somewhere safe — Varo Cloud will not display it again after you close this dialog.
+  </Step>
+
+  <Step title="Make your first API call">
+    With your API key in hand, confirm everything is wired up correctly by listing your projects. Replace `YOUR_API_KEY` with the key you just generated:
+
+    ```bash
+    curl https://api.varocloud.io/v1/projects \
+      -H "Authorization: Bearer YOUR_API_KEY"
+    ```
+
+    You should receive a response similar to this, showing the project you created in Step 2:
+
+    ```json
+    {
+      "projects": [
+        {
+          "id": "proj_abc123",
+          "name": "my-first-app",
+          "region": "us-east-1",
+          "status": "active",
+          "created_at": "2024-06-01T10:00:00Z"
+        }
+      ]
+    }
+    ```
+
+    If you see your project in the response, your API key is working correctly and you're ready to deploy.
+  </Step>
+
+  <Step title="Trigger a deployment">
+    Now trigger your first deployment by sending a `POST` request to the deployments endpoint. Use the `id` returned in the previous step as your `project_id`:
+
+    ```bash
+    curl -X POST https://api.varocloud.io/v1/deployments \
+      -H "Authorization: Bearer YOUR_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{"project_id": "proj_abc123", "environment": "production"}'
+    ```
+
+    Varo Cloud queues the deployment immediately and returns a deployment object:
+
+    ```json
+    {
+      "id": "dep_xyz789",
+      "project_id": "proj_abc123",
+      "environment": "production",
+      "status": "queued",
+      "created_at": "2024-06-01T10:05:00Z"
+    }
+    ```
+
+    The `status` field starts as `queued` and progresses through `building` → `deploying` → `active`. You can poll the same deployment ID or watch the status update live in the dashboard.
+  </Step>
+</Steps>
+
+<Tip>
+  You've completed your first end-to-end deployment on Varo Cloud. Next, read the [Core Concepts](/core-concepts) guide to understand how projects, environments, and deployments relate to each other — or jump straight into the full [API Reference](/api-reference) to explore everything the platform can do.
+</Tip>

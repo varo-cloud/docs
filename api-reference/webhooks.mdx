@@ -1,0 +1,204 @@
+---
+title: "Webhooks API — Receive Real-Time Event Notifications"
+sidebarTitle: "Webhooks"
+description: "Configure Varo Cloud webhooks to receive signed HTTP POST notifications for deployment, project, and user events directly in your own systems."
+---
+
+Webhooks let Varo Cloud notify your systems in real time when important events occur. Instead of polling the API to check whether a deployment succeeded or a new team member joined, you register an HTTPS endpoint and Varo Cloud delivers a signed HTTP POST payload to it the moment the event happens. This makes webhooks ideal for triggering CI/CD pipelines, updating internal dashboards, sending custom alerts, or keeping external systems synchronized with your Varo Cloud organization.
+
+Base URL: `https://api.varocloud.io/v1`
+
+All requests require an `Authorization: Bearer YOUR_API_KEY` header.
+
+---
+
+## POST /webhooks
+
+Registers a new webhook endpoint with your organization. You choose which events you want to subscribe to, and Varo Cloud will deliver a payload to your URL each time one of those events fires.
+
+<ParamField body="url" type="string" required>
+  The HTTPS endpoint that Varo Cloud should send event payloads to. Must begin with `https://`. Plain HTTP endpoints are not accepted.
+</ParamField>
+
+<ParamField body="events" type="array" required>
+  An array of event name strings to subscribe to. See [Supported Events](#supported-events) for the full list. Pass `["*"]` to subscribe to all events.
+</ParamField>
+
+<ParamField body="secret" type="string">
+  An optional secret string used to sign outgoing payloads with HMAC-SHA256. Strongly recommended so that you can verify each payload actually came from Varo Cloud. See [Verifying Webhook Signatures](#verifying-webhook-signatures) for details.
+</ParamField>
+
+<CodeGroup>
+```bash Request
+curl -X POST "https://api.varocloud.io/v1/webhooks" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://hooks.acme-corp.com/varo-events",
+    "events": [
+      "deployment.succeeded",
+      "deployment.failed",
+      "deployment.rolled_back"
+    ],
+    "secret": "whsec_your_random_secret_here"
+  }'
+```
+
+```json Response
+{
+  "id": "wh_zzz999",
+  "url": "https://hooks.acme-corp.com/varo-events",
+  "events": [
+    "deployment.succeeded",
+    "deployment.failed",
+    "deployment.rolled_back"
+  ],
+  "status": "active",
+  "created_at": "2024-01-15T12:00:00Z"
+}
+```
+</CodeGroup>
+
+<ResponseField name="id" type="string">
+  Unique identifier for the webhook, prefixed with `wh_`.
+</ResponseField>
+
+<ResponseField name="url" type="string">
+  The HTTPS endpoint registered to receive event payloads.
+</ResponseField>
+
+<ResponseField name="events" type="array">
+  The list of event names this webhook is subscribed to.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current status of the webhook. `active` means Varo Cloud will deliver payloads to this endpoint.
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 datetime string for when the webhook was created.
+</ResponseField>
+
+---
+
+## Supported Events
+
+Subscribe to any combination of the following events when creating a webhook.
+
+| Event | Trigger |
+|---|---|
+| `deployment.queued` | A deployment enters the queue |
+| `deployment.started` | Build begins for a queued deployment |
+| `deployment.succeeded` | A deployment completed successfully and went active |
+| `deployment.failed` | A deployment encountered a fatal error and failed |
+| `deployment.rolled_back` | A rollback was triggered for a deployment |
+| `project.created` | A new project was created in the organization |
+| `project.deleted` | A project was permanently deleted |
+| `user.invited` | A team member invitation was sent |
+| `user.removed` | A team member was removed from the organization |
+
+---
+
+## Webhook Payload Format
+
+Varo Cloud sends all event payloads as JSON in the body of an HTTP POST request to your registered endpoint. Every payload shares the same top-level structure: an `event` name, a `timestamp`, and a `data` object containing event-specific fields.
+
+The following example shows the payload delivered when a deployment succeeds:
+
+```json
+{
+  "event": "deployment.succeeded",
+  "timestamp": "2024-01-15T10:35:00Z",
+  "data": {
+    "deployment_id": "dep_xyz789",
+    "project_id": "proj_abc123",
+    "environment": "production",
+    "version": "v1.2.3"
+  }
+}
+```
+
+Your endpoint should respond with any HTTP `2xx` status code to acknowledge receipt. Varo Cloud treats any other response — including `3xx` redirects — as a failed delivery and will retry according to the schedule described in [Retry Behavior](#retry-behavior).
+
+---
+
+## Verifying Webhook Signatures
+
+When you provide a `secret` during webhook creation, Varo Cloud signs every outgoing payload using HMAC-SHA256 and includes the signature in the `X-Varo-Signature` header. The header value uses the format:
+
+```
+X-Varo-Signature: sha256=<hex_digest>
+```
+
+You should always verify this signature before processing a payload to confirm it originated from Varo Cloud and has not been tampered with. The Node.js example below shows a safe verification approach using a timing-safe comparison to prevent timing attacks:
+
+```javascript
+const crypto = require('crypto');
+
+function verifyWebhook(payload, signature, secret) {
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(payload, 'utf8')
+    .digest('hex');
+  return crypto.timingSafeEqual(
+    Buffer.from(signature),
+    Buffer.from(`sha256=${expected}`)
+  );
+}
+```
+
+In this function, `payload` is the raw request body string (before any JSON parsing), `signature` is the value of the `X-Varo-Signature` header, and `secret` is the secret string you provided when creating the webhook. Return `false` from this function means the payload should be rejected.
+
+---
+
+## Retry Behavior
+
+If your endpoint does not return an HTTP `2xx` response within **10 seconds**, Varo Cloud considers the delivery attempt failed and schedules a retry. Deliveries are retried up to **5 times** using exponential backoff, with delays of approximately 30 seconds, 2 minutes, 10 minutes, 30 minutes, and 2 hours between attempts. After 5 failed attempts, the delivery is abandoned and the webhook's status may be set to `inactive`.
+
+<Note>
+  Because retries can result in the same event being delivered more than once, your webhook handler should be **idempotent**. Use the `deployment_id` or other resource IDs in the `data` payload as a deduplication key to avoid processing the same event twice.
+</Note>
+
+---
+
+## GET /webhooks
+
+Returns a list of all webhooks registered in your organization, including their subscribed events and current status.
+
+<CodeGroup>
+```bash Request
+curl -X GET "https://api.varocloud.io/v1/webhooks" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```json Response
+{
+  "data": [
+    {
+      "id": "wh_zzz999",
+      "url": "https://hooks.acme-corp.com/varo-events",
+      "events": ["deployment.succeeded", "deployment.failed", "deployment.rolled_back"],
+      "status": "active",
+      "created_at": "2024-01-15T12:00:00Z"
+    }
+  ]
+}
+```
+</CodeGroup>
+
+## DELETE /webhooks/{id}
+
+Permanently removes a webhook. Varo Cloud will immediately stop delivering events to the associated endpoint.
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the webhook to delete.
+</ParamField>
+
+<CodeGroup>
+```bash Request
+curl -X DELETE "https://api.varocloud.io/v1/webhooks/wh_zzz999" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+A successful deletion returns `204 No Content` with an empty response body.

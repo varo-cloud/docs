@@ -1,0 +1,75 @@
+---
+title: "Managing Team Members and Access Control in Varo Cloud"
+sidebarTitle: "Team Management"
+description: "Invite teammates to Varo Cloud, assign roles, and control who can deploy, configure environments, or manage billing in your organization."
+---
+
+Varo Cloud lets you collaborate by inviting teammates and assigning roles that control what each person can do across your organization. Whether you need to give a new developer deploy access or grant a billing manager visibility without touching any infrastructure, roles give you the granularity to match your team's structure.
+
+## Roles overview
+
+Every member of your Varo Cloud organization is assigned one of four roles. The table below summarizes what each role can do.
+
+| Role          | Can Deploy | Can Configure | Can Manage Billing | Can Manage Members |
+|---------------|:----------:|:-------------:|:------------------:|:------------------:|
+| **Owner**     | ✅          | ✅             | ✅                  | ✅                  |
+| **Admin**     | ✅          | ✅             | ❌                  | ✅                  |
+| **Developer** | ✅          | ❌             | ❌                  | ❌                  |
+| **Viewer**    | ❌          | ❌             | ❌                  | ❌                  |
+
+- **Owner** — full control over the organization, including billing and ownership transfer. Only one Owner exists per organization.
+- **Admin** — can do everything the Owner can except manage billing and transfer ownership. Suitable for team leads who need full operational control.
+- **Developer** — can trigger and manage deployments but cannot change environment configuration, integrations, or team membership. Suitable for most engineers.
+- **Viewer** — read-only access to dashboards, logs, and metrics. Suitable for stakeholders who need visibility without making changes.
+
+## Invite a teammate
+
+<Steps>
+  <Step title="Open Team settings">
+    In your dashboard, go to **Settings → Team**.
+  </Step>
+  <Step title="Click Invite Member">
+    Click the **Invite Member** button in the top-right corner of the Team page.
+  </Step>
+  <Step title="Enter the person's email address">
+    Type the email address of the person you want to invite. The address does not need to be associated with an existing Varo Cloud account.
+  </Step>
+  <Step title="Select a role">
+    Choose the role that matches the access level this person needs: Owner, Admin, Developer, or Viewer. You can change the role later at any time.
+  </Step>
+  <Step title="Send the invitation">
+    Click **Send Invite**. The person will receive an email with a link to accept the invitation and set up their account. The invitation expires after 7 days if not accepted.
+  </Step>
+</Steps>
+
+## Change a member's role
+
+To update the role of an existing team member, go to **Settings → Team**, click the member's name, select **Change Role**, choose the new role from the dropdown, and click **Save**.
+
+<Warning>
+  Changing someone from **Admin** to **Developer** removes their ability to manage team members and modify environment configuration. Any environment variables, integration settings, or team invitations they were responsible for will remain in place, but they will no longer be able to edit or delete them.
+</Warning>
+
+Role changes take effect immediately — the affected member's session will reflect the new permissions on their next page load.
+
+## Remove a team member
+
+To remove someone from your organization, go to **Settings → Team**, click the **•••** menu next to the member you want to remove, and select **Remove**. You will be asked to confirm before the change is applied.
+
+When a member is removed:
+
+- Their access to the dashboard is revoked immediately
+- All API keys associated with their account are invalidated
+- Any deployments they triggered remain in the deployment history and are unaffected
+
+If the member has open pull requests connected via the GitHub integration, those deployments will continue normally since they are tied to the repository, not the individual user.
+
+## Project-level access (Enterprise)
+
+On **Enterprise** plans, you can define access controls at the project level in addition to the organization-level roles described above. Project-level access lets you, for example, restrict a Developer so they can only deploy to specific projects, or give a Viewer access to one project's monitoring data without exposing other projects.
+
+Project-level permissions are configured from **Project → Settings → Access Control** and override the organization role for members within that project. Contact your account manager or visit the Enterprise documentation for full details.
+
+<Note>
+  The organization **Owner** role cannot be removed by any other team member. If you need to transfer ownership to someone else, go to **Settings → Organization → Transfer Ownership**. The new owner must be an existing Admin on the account. After the transfer, your role automatically changes to Admin.
+</Note>

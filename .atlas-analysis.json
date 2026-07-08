@@ -1,0 +1,106 @@
+{
+  "projectType": "saas",
+  "projectName": "Varo Cloud",
+  "projectDescription": "Varo Cloud is a cloud platform that enables businesses to deploy, manage, and scale their operations with an integrated suite of tools and services.",
+  "theme": "luma",
+  "primaryColor": "#3B6FE8",
+  "lightColor": "#6B9AF5",
+  "darkColor": "#2251C5",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "core-concepts"
+            ]
+          },
+          {
+            "group": "Setup & Configuration",
+            "pages": [
+              "setup/account",
+              "setup/authentication",
+              "setup/environments",
+              "setup/billing"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/first-deployment",
+              "guides/integrations",
+              "guides/monitoring",
+              "guides/team-management"
+            ]
+          },
+          {
+            "group": "Support",
+            "pages": [
+              "support/faq",
+              "support/troubleshooting"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api-reference/introduction",
+              "api-reference/authentication",
+              "api-reference/errors"
+            ]
+          },
+          {
+            "group": "Resources",
+            "pages": [
+              "api-reference/resources/projects",
+              "api-reference/resources/deployments",
+              "api-reference/resources/users",
+              "api-reference/resources/integrations"
+            ]
+          },
+          {
+            "group": "Webhooks",
+            "pages": [
+              "api-reference/webhooks"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "One-click cloud deployments",
+    "Environment management (dev, staging, production)",
+    "Team collaboration and access control",
+    "REST API for programmatic management",
+    "Webhooks for event-driven integrations",
+    "Built-in monitoring and logging",
+    "Third-party integrations",
+    "Flexible billing and plan management"
+  ],
+  "publicApiSurface": [
+    "GET /projects",
+    "POST /projects",
+    "GET /projects/{id}",
+    "PUT /projects/{id}",
+    "DELETE /projects/{id}",
+    "GET /deployments",
+    "POST /deployments",
+    "GET /deployments/{id}",
+    "POST /deployments/{id}/rollback",
+    "GET /users",
+    "POST /users/invite",
+    "GET /integrations",
+    "POST /integrations",
+    "POST /webhooks",
+    "GET /webhooks"
+  ]
+}

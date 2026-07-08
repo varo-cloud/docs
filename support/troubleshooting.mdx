@@ -1,0 +1,83 @@
+---
+title: "Troubleshooting Guide for Common Varo Cloud Issues"
+sidebarTitle: "Troubleshooting"
+description: "Diagnose and fix common Varo Cloud errors including failed deployments, authentication problems, environment variable issues, and API errors."
+---
+
+If something isn't working as expected, this guide walks through the most common issues and how to resolve them. Each section covers a specific problem area — start with the one that matches your symptoms, check the suggested fix, and reach out to support if the issue persists.
+
+## Authentication Issues
+
+<AccordionGroup>
+  <Accordion title="401 Unauthorized on every request">
+    A `401` response means the server cannot identify who is making the request. Confirm that every API call includes the header `Authorization: Bearer YOUR_API_KEY` exactly — a missing `Bearer` prefix or trailing whitespace in the key value are common mistakes. If the key was recently rotated or you're unsure whether it's still valid, generate a new one under **Settings → API Keys** and update your client or environment variable.
+  </Accordion>
+
+  <Accordion title="403 Forbidden on specific actions">
+    A `403` response means Varo Cloud recognizes your identity but your role does not permit the action you're attempting. Your API key may be scoped to the **Viewer** role, which is read-only. Navigate to **Settings → Team**, find your user or the service account the key belongs to, and confirm the assigned role. Ask an organization **Admin** to upgrade your role to **Deployer** or **Editor** if you need write access.
+  </Accordion>
+
+  <Accordion title="API key not working after rotation">
+    When you rotate an API key, the previous key is invalidated immediately — there is no grace period. If requests start failing after a rotation, you likely have one or more services, pipelines, or environment variables still referencing the old key. Audit every location where the key is stored (CI/CD secrets, `.env` files, third-party integrations) and replace each occurrence with the new key before retrying.
+  </Accordion>
+</AccordionGroup>
+
+## Deployment Failures
+
+<AccordionGroup>
+  <Accordion title='Deployment stuck in "queued" for more than 5 minutes'>
+    A deployment that stays in the **queued** state for more than five minutes usually indicates elevated build queue depth during a high-traffic period. Check [status.varocloud.io](https://status.varocloud.io) for any active incidents or degraded build capacity. If the status page shows no issues, try cancelling the queued deployment and re-triggering it — the retry is typically picked up immediately. Contact support if the problem recurs consistently.
+  </Accordion>
+
+  <Accordion title='Build fails with "out of memory"'>
+    Build memory limits are set per plan: Free (512 MB), Pro (2 GB), and Enterprise (configurable). If your build process — for example, a Node.js bundler, a Docker multi-stage build, or a test suite — exceeds the limit for your current plan, the build is terminated with an out-of-memory error. Upgrade your plan for a higher limit, or reduce memory pressure by splitting large build steps, using slimmer base images, or increasing build-time swap in your `varo.yaml` configuration.
+  </Accordion>
+
+  <Accordion title='Deployment marked "failed" immediately'>
+    An instant failure typically means the container exited before Varo Cloud could confirm it was healthy. Open the **Deployments** tab, select the failed deployment, and expand the **Logs** panel to find the specific error message. The three most common root causes are: a required environment variable that is missing or misspelled, the application not listening on the port declared in your project settings, or a health check endpoint returning a non-200 status code. Fix the underlying issue, then trigger a new deployment.
+  </Accordion>
+
+  <Accordion title="Health check failing after deploy">
+    Varo Cloud sends an HTTP GET request to your configured health check path (default `/health`) on the port declared in your project settings. If that request does not receive an HTTP `200` response within the timeout window, the deployment is marked failed and the previous version is restored. Verify that your application binds to `0.0.0.0` (not `127.0.0.1`) on the expected port, that the health check route exists and is reachable without authentication, and that startup time does not exceed the configured initial delay. You can adjust the health check path, port, and timeout under **Project Settings → Health Checks**.
+  </Accordion>
+</AccordionGroup>
+
+## Environment & Configuration Issues
+
+<AccordionGroup>
+  <Accordion title="Environment variable changes not taking effect">
+    Varo Cloud injects environment variables at deployment time, not dynamically at runtime. This means that adding, editing, or deleting a variable has no effect on a running deployment — you must trigger a new deployment for the changes to be picked up. After saving your variable updates in **Project Settings → Environment Variables**, click **Redeploy** or push a new commit to start a fresh deployment with the updated values.
+  </Accordion>
+
+  <Accordion title="Secrets showing as undefined in production">
+    Environment variables and secrets in Varo Cloud are scoped to a specific environment (for example, **production**, **staging**, or **preview**). If a secret is defined in your staging environment but your production deployment can't find it, the variable simply hasn't been added to the production environment yet. Navigate to **Project Settings → Environment Variables**, switch to the **Production** environment tab, and add the secret there. Remember that each environment maintains its own independent set of variables.
+  </Accordion>
+</AccordionGroup>
+
+## API Error Reference
+
+The table below lists the HTTP status codes and error codes you may encounter when calling the Varo Cloud API, along with the most likely cause and recommended fix for each.
+
+| Status | Error Code | Description | Fix |
+|--------|------------|-------------|-----|
+| 400 | `invalid_request` | Malformed request body | Check JSON syntax and ensure all required fields are present |
+| 401 | `unauthorized` | Missing or invalid API key | Verify the `Authorization: Bearer` header is correctly formatted |
+| 403 | `forbidden` | Insufficient permissions for the action | Check your assigned role in **Settings → Team** |
+| 404 | `not_found` | The requested resource does not exist | Verify the resource ID and that you're targeting the correct organization |
+| 409 | `conflict` | Duplicate resource or incompatible state | Check for an existing resource with the same name or an in-progress operation |
+| 422 | `validation_error` | One or more field values failed validation | Inspect the `error.details` array in the response body for per-field messages |
+| 429 | `rate_limited` | Rate limit exceeded for your plan | Reduce request frequency and implement exponential backoff with the `Retry-After` header |
+| 500 | `server_error` | Unexpected error on the Varo Cloud side | Retry the request; if the error persists, contact support with the `request_id` from the response |
+
+## Contact Support
+
+If you've worked through the steps above and still can't resolve your issue, the Varo Cloud support team is here to help. Include your `request_id`, deployment ID, and a description of what you've already tried to get the fastest response.
+
+<CardGroup cols={2}>
+  <Card title="Email Support" icon="envelope" href="mailto:support@varocloud.io">
+    Send a message to the support team. Responses are typically within one business day for Pro plans and within four hours for Enterprise plans.
+  </Card>
+  <Card title="Status Page" icon="signal" href="https://status.varocloud.io">
+    Check real-time platform health, view active incidents, and subscribe to status updates for Varo Cloud services.
+  </Card>
+</CardGroup>
