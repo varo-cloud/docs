@@ -8,13 +8,13 @@ By the end of this guide you will have a Varo Cloud account, a live project, a w
 
 <Note>
   **Before you begin, make sure you have:**
-  - A Varo Cloud account. If you don't have one yet, sign up for free at [app.varocloud.io](https://app.varocloud.io).
+  - A Varo Cloud account. If you don't have one yet, sign up for free at [varo.cloud/auth](https://varo.cloud/auth).
   - A working terminal with `curl` available if you want to follow along with the API examples.
 </Note>
 
 <Steps>
   <Step title="Create your account">
-    Navigate to [app.varocloud.io](https://app.varocloud.io) and click **Sign Up**. Enter your email address and choose a password, then check your inbox for a verification email. Click the confirmation link to activate your account and land on the Varo Cloud dashboard for the first time.
+    Navigate to [varo.cloud/auth](https://varo.cloud/auth) and click **Sign Up**. Enter your email address and choose a password, then check your inbox for a verification email. Click the confirmation link to activate your account and land on the Varo Cloud dashboard for the first time.
   </Step>
 
   <Step title="Create a project">
@@ -29,7 +29,7 @@ By the end of this guide you will have a Varo Cloud account, a live project, a w
     With your API key in hand, confirm everything is wired up correctly by listing your projects. Replace `YOUR_API_KEY` with the key you just generated:
 
     ```bash
-    curl https://api.varocloud.io/v1/projects \
+    curl https://inference.varo.cloud/v1/projects \
       -H "Authorization: Bearer YOUR_API_KEY"
     ```
 
@@ -56,7 +56,7 @@ By the end of this guide you will have a Varo Cloud account, a live project, a w
     Now trigger your first deployment by sending a `POST` request to the deployments endpoint. Use the `id` returned in the previous step as your `project_id`:
 
     ```bash
-    curl -X POST https://api.varocloud.io/v1/deployments \
+    curl -X POST https://inference.varo.cloud/v1/deployments \
       -H "Authorization: Bearer YOUR_API_KEY" \
       -H "Content-Type: application/json" \
       -d '{"project_id": "proj_abc123", "environment": "production"}'

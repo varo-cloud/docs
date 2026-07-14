@@ -6,7 +6,7 @@ description: "REST API endpoints for creating, listing, updating, and deleting V
 
 Projects are the top-level organizational unit in Varo Cloud. Every deployment, environment configuration, and integration belongs to a project. You can use the Projects API to programmatically create and manage projects across your organization, automate provisioning pipelines, and keep your infrastructure in sync with your internal tooling.
 
-Base URL: `https://api.varocloud.io/v1`
+Base URL: `https://inference.varo.cloud/v1`
 
 All requests require an `Authorization: Bearer YOUR_API_KEY` header.
 
@@ -26,7 +26,7 @@ Returns a paginated list of all projects in your organization.
 
 <CodeGroup>
 ```bash Request
-curl -X GET "https://api.varocloud.io/v1/projects?per_page=20" \
+curl -X GET "https://inference.varo.cloud/v1/projects?per_page=20" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -92,7 +92,7 @@ Creates a new project in your organization.
 
 <CodeGroup>
 ```bash Request
-curl -X POST "https://api.varocloud.io/v1/projects" \
+curl -X POST "https://inference.varo.cloud/v1/projects" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -135,7 +135,7 @@ Retrieves a single project by its ID.
 
 <CodeGroup>
 ```bash Request
-curl -X GET "https://api.varocloud.io/v1/projects/proj_abc123" \
+curl -X GET "https://inference.varo.cloud/v1/projects/proj_abc123" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -172,7 +172,7 @@ Updates the name or description of an existing project.
 
 <CodeGroup>
 ```bash Request
-curl -X PUT "https://api.varocloud.io/v1/projects/proj_abc123" \
+curl -X PUT "https://inference.varo.cloud/v1/projects/proj_abc123" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -210,7 +210,7 @@ Permanently deletes a project and all of its associated resources.
 
 <CodeGroup>
 ```bash Request
-curl -X DELETE "https://api.varocloud.io/v1/projects/proj_abc123" \
+curl -X DELETE "https://inference.varo.cloud/v1/projects/proj_abc123" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 </CodeGroup>

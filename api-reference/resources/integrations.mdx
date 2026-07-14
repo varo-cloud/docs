@@ -6,7 +6,7 @@ description: "REST API endpoints for listing, creating, and removing Varo Cloud 
 
 Integrations connect your Varo Cloud organization to the external tools your team already uses. Once an integration is in place, Varo Cloud can automatically trigger deployments from Git pushes, post deployment status updates to Slack, forward metrics and alerts to Datadog, or communicate with any custom HTTPS endpoint you specify. You can manage all integrations programmatically through the Integrations API.
 
-Base URL: `https://api.varocloud.io/v1`
+Base URL: `https://inference.varo.cloud/v1`
 
 All requests require an `Authorization: Bearer YOUR_API_KEY` header.
 
@@ -18,7 +18,7 @@ Returns a list of all integrations configured in your organization.
 
 <CodeGroup>
 ```bash Request
-curl -X GET "https://api.varocloud.io/v1/integrations" \
+curl -X GET "https://inference.varo.cloud/v1/integrations" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -89,7 +89,7 @@ The example below creates a GitHub integration that watches the `main` branch of
 
 <CodeGroup>
 ```bash Request
-curl -X POST "https://api.varocloud.io/v1/integrations" \
+curl -X POST "https://inference.varo.cloud/v1/integrations" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -154,7 +154,7 @@ Retrieves the full details of a single integration, including its configuration.
 
 <CodeGroup>
 ```bash Request
-curl -X GET "https://api.varocloud.io/v1/integrations/int_aaa111" \
+curl -X GET "https://inference.varo.cloud/v1/integrations/int_aaa111" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -186,7 +186,7 @@ Permanently removes an integration from your organization. Varo Cloud will immed
 
 <CodeGroup>
 ```bash Request
-curl -X DELETE "https://api.varocloud.io/v1/integrations/int_ccc333" \
+curl -X DELETE "https://inference.varo.cloud/v1/integrations/int_ccc333" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 </CodeGroup>

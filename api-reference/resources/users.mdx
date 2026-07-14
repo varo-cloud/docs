@@ -6,7 +6,7 @@ description: "REST API endpoints for listing organization members, sending invit
 
 The Users API lets you manage the people who have access to your Varo Cloud organization. You can list current members, invite new teammates by email, update someone's role as their responsibilities change, and remove users when they leave your team. Role changes and removals take effect immediately, so you can use this API to automate onboarding and offboarding workflows from your identity provider or HR systems.
 
-Base URL: `https://api.varocloud.io/v1`
+Base URL: `https://inference.varo.cloud/v1`
 
 All requests require an `Authorization: Bearer YOUR_API_KEY` header.
 
@@ -18,7 +18,7 @@ Returns a list of all members currently active in your organization.
 
 <CodeGroup>
 ```bash Request
-curl -X GET "https://api.varocloud.io/v1/users" \
+curl -X GET "https://inference.varo.cloud/v1/users" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -98,7 +98,7 @@ Sends an email invitation to a new team member. The invitation includes a link t
 
 <CodeGroup>
 ```bash Request
-curl -X POST "https://api.varocloud.io/v1/users/invite" \
+curl -X POST "https://inference.varo.cloud/v1/users/invite" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -150,7 +150,7 @@ Retrieves the full profile of a single organization member.
 
 <CodeGroup>
 ```bash Request
-curl -X GET "https://api.varocloud.io/v1/users/usr_bbb222" \
+curl -X GET "https://inference.varo.cloud/v1/users/usr_bbb222" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -186,7 +186,7 @@ Updates a team member's role within the organization.
 
 <CodeGroup>
 ```bash Request
-curl -X PUT "https://api.varocloud.io/v1/users/usr_bbb222" \
+curl -X PUT "https://inference.varo.cloud/v1/users/usr_bbb222" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -222,7 +222,7 @@ Removes a user from the organization immediately.
 
 <CodeGroup>
 ```bash Request
-curl -X DELETE "https://api.varocloud.io/v1/users/usr_ccc333" \
+curl -X DELETE "https://inference.varo.cloud/v1/users/usr_ccc333" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 </CodeGroup>

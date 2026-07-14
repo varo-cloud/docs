@@ -1,13 +1,13 @@
 ---
 title: "Get Started with the Varo Cloud API"
 sidebarTitle: "Get Started"
-description: "Make your first Varo Cloud API request in under 5 minutes. Generate an API key, install a client, and trigger a deployment programmatically."
+description: "Make your first Varo Cloud API request in under 5 minutes. Generate an API key and run your first model to create an image or video."
 ---
 
-This guide walks you through everything you need to make your first authenticated request to the Varo Cloud API — from generating a key to triggering a real deployment.
+This guide walks you through everything you need to make your first authenticated request to the Varo Cloud API — from generating a key to running a model and getting back a result.
 
 <Info>
-  **Base URL:** `https://api.varocloud.io/v1` — all endpoints in this guide are relative to it.
+  **Base URL:** `https://inference.varo.cloud/v1` — all endpoints in this guide are relative to it.
 </Info>
 
 ## Prerequisites
@@ -15,12 +15,12 @@ This guide walks you through everything you need to make your first authenticate
 Before you start, make sure you have:
 
 <CardGroup cols={2}>
-  <Card title="A Varo Cloud account" icon="user" href="https://app.varocloud.io">
-    [Sign up](https://app.varocloud.io) if you don't have one yet — the free tier is enough to follow this guide.
+  <Card title="A Varo Cloud account" icon="user" href="https://varo.cloud/auth">
+    [Sign up](https://varo.cloud/auth) if you don't have one yet — the free tier is enough to start building with multiple models.
   </Card>
 
-  <Card title="A project" icon="folder" href="/setup/account">
-    Create at least one project in the dashboard so you have something to deploy against.
+  <Card title="An API key" icon="key">
+    Generate an `sk_live_` key from your dashboard. You'll pass it as a Bearer token on every request.
   </Card>
 
   <Card title="curl or a language runtime" icon="terminal">
@@ -28,7 +28,7 @@ Before you start, make sure you have:
   </Card>
 
   <Card title="5 minutes" icon="clock">
-    That's all it takes to go from zero to your first successful API call.
+    That's all it takes to go from zero to your first generated asset.
   </Card>
 </CardGroup>
 
@@ -38,16 +38,16 @@ All requests to the Varo Cloud API are authenticated with a bearer token. To cre
 
 <Steps>
   <Step title="Open the dashboard">
-    Sign in at [app.varocloud.io](https://app.varocloud.io) and navigate to **Settings → API Keys**.
+    Sign in at [varo.cloud/auth](https://varo.cloud/auth) and open **API Keys** in your dashboard.
   </Step>
   <Step title="Create a new key">
-    Click **Create API Key**, give it a descriptive name (e.g. `local-dev` or `ci-pipeline`), and choose the scopes it needs.
+    Click **Create key**, give it a descriptive name (e.g. `local-dev` or `ci-pipeline`), and choose the scopes it needs.
   </Step>
   <Step title="Copy and store it securely">
     The full key is shown **only once**. Copy it immediately and store it in a secret manager or environment variable — never commit it to source control.
 
     ```bash
-    export VARO_API_KEY="vk_live_..."
+    export VARO_API_KEY="sk_live_..."
     ```
   </Step>
 </Steps>
@@ -56,93 +56,43 @@ All requests to the Varo Cloud API are authenticated with a bearer token. To cre
   Treat your API key like a password. If a key is ever exposed, rotate it immediately from the dashboard.
 </Warning>
 
-## Step 2: Make Your First Request
+## Step 2: Run Your First Generation
 
-Let's verify your key works by listing your projects. Pass the key in the `Authorization` header as a bearer token:
-
-<CodeGroup>
-
-```bash cURL
-curl https://api.varocloud.io/v1/projects \
-  -H "Authorization: Bearer $VARO_API_KEY"
-```
-
-```javascript Node.js
-const response = await fetch("https://api.varocloud.io/v1/projects", {
-  headers: {
-    Authorization: `Bearer ${process.env.VARO_API_KEY}`,
-  },
-});
-
-const { data } = await response.json();
-console.log(data);
-```
-
-```python Python
-import os
-import requests
-
-response = requests.get(
-    "https://api.varocloud.io/v1/projects",
-    headers={"Authorization": f"Bearer {os.environ['VARO_API_KEY']}"},
-)
-
-print(response.json()["data"])
-```
-
-</CodeGroup>
-
-A successful response returns your projects wrapped in the standard envelope:
-
-```json
-{
-  "data": [
-    {
-      "id": "proj_a1b2c3",
-      "name": "my-first-app",
-      "created_at": "2026-06-15T10:30:00Z"
-    }
-  ],
-  "pagination": { "total": 1, "per_page": 20, "next_cursor": null },
-  "meta": { "request_id": "req_abc123" }
-}
-```
-
-If you get back a `401 Unauthorized`, double-check that your key is correct and hasn't been revoked. See [Errors](/api-reference/errors) for the full list of response codes.
-
-## Step 3: Trigger a Deployment
-
-Now that authentication works, let's do something real: kick off a deployment. Replace `proj_a1b2c3` with an ID from the response above.
+Let's create an image. Send a `POST` request to `/v1/generations` with the model you want to run and its inputs. Pass your key in the `Authorization` header as a bearer token:
 
 <CodeGroup>
 
 ```bash cURL
-curl -X POST https://api.varocloud.io/v1/deployments \
+curl -X POST https://inference.varo.cloud/v1/generations \
   -H "Authorization: Bearer $VARO_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "project_id": "proj_a1b2c3",
-    "environment": "production",
-    "git_ref": "main"
+    "model": "google-nano-banana-pro/text-to-image",
+    "prompt": "a cat sitting on a windowsill, golden hour lighting, photorealistic",
+    "aspect_ratio": "4:3",
+    "output_format": "jpeg",
+    "resolution": "1K"
   }'
 ```
 
 ```javascript Node.js
-const response = await fetch("https://api.varocloud.io/v1/deployments", {
+const response = await fetch("https://inference.varo.cloud/v1/generations", {
   method: "POST",
   headers: {
     Authorization: `Bearer ${process.env.VARO_API_KEY}`,
     "Content-Type": "application/json",
   },
   body: JSON.stringify({
-    project_id: "proj_a1b2c3",
-    environment: "production",
-    git_ref: "main",
+    model: "google-nano-banana-pro/text-to-image",
+    prompt: "a cat sitting on a windowsill, golden hour lighting, photorealistic",
+    aspect_ratio: "4:3",
+    output_format: "jpeg",
+    resolution: "1K",
   }),
 });
 
-const { data: deployment } = await response.json();
-console.log(`Deployment ${deployment.id} status: ${deployment.status}`);
+const generation = await response.json();
+console.log(generation.output.url);
 ```
 
 ```python Python
@@ -150,83 +100,100 @@ import os
 import requests
 
 response = requests.post(
-    "https://api.varocloud.io/v1/deployments",
+    "https://inference.varo.cloud/v1/generations",
     headers={
         "Authorization": f"Bearer {os.environ['VARO_API_KEY']}",
         "Content-Type": "application/json",
     },
     json={
-        "project_id": "proj_a1b2c3",
-        "environment": "production",
-        "git_ref": "main",
+        "model": "google-nano-banana-pro/text-to-image",
+        "prompt": "a cat sitting on a windowsill, golden hour lighting, photorealistic",
+        "aspect_ratio": "4:3",
+        "output_format": "jpeg",
+        "resolution": "1K",
     },
 )
 
-deployment = response.json()["data"]
-print(f"Deployment {deployment['id']} status: {deployment['status']}")
+generation = response.json()
+print(generation["output"]["url"])
 ```
 
 </CodeGroup>
 
-The response returns immediately with the newly created deployment in a `pending` state:
+## Step 3: Read the Response
+
+The API returns a **generation object**. When `status` is `completed`, `output.url` points to your finished asset:
 
 ```json
 {
-  "data": {
-    "id": "dep_x9y8z7",
-    "project_id": "proj_a1b2c3",
-    "environment": "production",
-    "status": "pending",
-    "git_ref": "main",
-    "created_at": "2026-07-06T14:22:10Z"
+  "id": "9d481365-2b49-4e94-ac9b-c3d2db5b2374",
+  "object": "generation",
+  "status": "completed",
+  "model": "google-nano-banana-pro/text-to-image",
+  "created_at": 1783996705,
+  "output": {
+    "type": "image",
+    "url": "https://staging-assets.varo.cloud/generations/.../result.jpeg"
   },
-  "meta": { "request_id": "req_def456" }
+  "usage": {
+    "cost_usd": 0.04
+  }
 }
 ```
 
-## Step 4: Poll for Status
+| Field | Description |
+| --- | --- |
+| `id` | Unique identifier for this generation |
+| `status` | Generation state — `completed` when the asset is ready |
+| `model` | The model that produced the output |
+| `output.type` | `image` or `video`, depending on the model |
+| `output.url` | Direct link to download the generated asset |
+| `usage.cost_usd` | Cost of this generation, in USD (varies by model and parameters) |
 
-Deployments run asynchronously. Poll the deployment endpoint until `status` becomes `succeeded` or `failed`:
+<Warning>
+  If you get back a `401 Unauthorized`, double-check that your key is correct, starts with `sk_live_`, and hasn't been revoked. See [Errors](/api-reference/errors) for the full list of response codes.
+</Warning>
+
+## Step 4: Try Another Model
+
+The same endpoint runs every model on the platform — just change the `model` field and its inputs. Here's a video model instead of an image one:
 
 ```bash
-curl https://api.varocloud.io/v1/deployments/dep_x9y8z7 \
-  -H "Authorization: Bearer $VARO_API_KEY"
+curl -X POST https://inference.varo.cloud/v1/generations \
+  -H "Authorization: Bearer $VARO_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "alibaba-wan-2-7/reference-to-video",
+    "prompt": "the cat slowly turns to look at the camera"
+  }'
+```
+
+The response has the same shape, with `output.type` set to `video`:
+
+```json
+{
+  "id": "9d481365-2b49-4e94-ac9b-c3d2db5b2374",
+  "object": "generation",
+  "status": "completed",
+  "model": "alibaba-wan-2-7/reference-to-video",
+  "created_at": 1783996705,
+  "output": {
+    "type": "video",
+    "url": "https://staging-assets.varo.cloud/generations/.../result.mp4"
+  },
+  "usage": {
+    "cost_usd": 0.5
+  }
+}
 ```
 
 <Tip>
-  For production integrations, use [webhooks](/api-reference/webhooks) instead of polling. Varo Cloud will push signed events to your endpoint as soon as a deployment's status changes.
+  One API, one key, one response shape for every model — swap the `model` field to move between image, video, and other modalities without changing your integration.
 </Tip>
-
-## Handling Errors
-
-Every error response includes a machine-readable `code` and a human-readable `message`:
-
-```json
-{
-  "error": {
-    "code": "invalid_request",
-    "message": "Field 'git_ref' is required.",
-    "field": "git_ref"
-  },
-  "meta": { "request_id": "req_ghi789" }
-}
-```
-
-Include the `meta.request_id` when contacting support — it lets us trace your request through our logs instantly.
-
-## Rate Limits
-
-The default limit is **1,000 requests per 10-minute window** per API key. Monitor these headers on every response:
-
-| Header | Description |
-| --- | --- |
-| `X-RateLimit-Limit` | Requests allowed in the current window |
-| `X-RateLimit-Remaining` | Requests remaining in the current window |
-| `X-RateLimit-Reset` | Unix timestamp when the window resets |
 
 ## Next Steps
 
-You've made your first authenticated request and triggered a deployment. Here's where to go next:
+You've run your first model and retrieved a result. Here's where to go next:
 
 <CardGroup cols={2}>
   <Card title="Full API Reference" icon="book" href="/api-reference/introduction">
@@ -237,8 +204,8 @@ You've made your first authenticated request and triggered a deployment. Here's 
     Learn about key scopes, rotation, and best practices.
   </Card>
 
-  <Card title="Deployments API" icon="rocket" href="/api-reference/resources/deployments">
-    Roll back, cancel, and inspect logs for any deployment.
+  <Card title="Errors" icon="triangle-exclamation" href="/api-reference/errors">
+    Understand error codes and how to handle failed generations.
   </Card>
 
   <Card title="Webhooks" icon="webhook" href="/api-reference/webhooks">

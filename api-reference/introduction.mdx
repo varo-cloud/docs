@@ -11,13 +11,13 @@ The Varo Cloud REST API gives you programmatic access to everything available in
 All API requests are made over HTTPS to the following base URL:
 
 ```text
-https://api.varocloud.io/v1
+https://inference.varo.cloud/v1
 ```
 
 Every endpoint path is appended directly to this base. Here is a minimal example that lists your projects:
 
 ```bash
-curl https://api.varocloud.io/v1/projects \
+curl https://inference.varo.cloud/v1/projects \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -69,7 +69,7 @@ List endpoints use cursor-based pagination. Rather than requesting results by pa
 Use the `per_page` parameter to control how many items are returned per page (maximum 100). If `next_cursor` is absent from the response, you have reached the last page.
 
 ```bash
-curl "https://api.varocloud.io/v1/deployments?per_page=50&cursor=cursor_xyz" \
+curl "https://inference.varo.cloud/v1/deployments?per_page=50&cursor=cursor_xyz" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 

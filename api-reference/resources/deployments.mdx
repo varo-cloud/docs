@@ -6,7 +6,7 @@ description: "REST API endpoints for creating, listing, monitoring, rolling back
 
 The Deployments API gives you full programmatic control over the deployment lifecycle in Varo Cloud. You can trigger deployments from a Git repository or a container image, monitor their progress in real time via log streaming, roll back to a previous stable version, or cancel a deployment that is still queued or building. Every deployment belongs to a project and targets a named environment such as `production`, `staging`, or `preview`.
 
-Base URL: `https://api.varocloud.io/v1`
+Base URL: `https://inference.varo.cloud/v1`
 
 All requests require an `Authorization: Bearer YOUR_API_KEY` header.
 
@@ -38,7 +38,7 @@ Returns a paginated list of deployments, optionally filtered by project, environ
 
 <CodeGroup>
 ```bash Request
-curl -X GET "https://api.varocloud.io/v1/deployments?project_id=proj_abc123&environment=production&per_page=20" \
+curl -X GET "https://inference.varo.cloud/v1/deployments?project_id=proj_abc123&environment=production&per_page=20" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -104,7 +104,7 @@ Creates and queues a new deployment for the specified project and environment.
 
 <CodeGroup>
 ```bash Request
-curl -X POST "https://api.varocloud.io/v1/deployments" \
+curl -X POST "https://inference.varo.cloud/v1/deployments" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -151,7 +151,7 @@ Retrieves the full details of a single deployment.
 
 <CodeGroup>
 ```bash Request
-curl -X GET "https://api.varocloud.io/v1/deployments/dep_xyz789" \
+curl -X GET "https://inference.varo.cloud/v1/deployments/dep_xyz789" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -188,7 +188,7 @@ Returns an array of log entries generated during the deployment build and rollou
 
 <CodeGroup>
 ```bash Request
-curl -X GET "https://api.varocloud.io/v1/deployments/dep_xyz789/logs" \
+curl -X GET "https://inference.varo.cloud/v1/deployments/dep_xyz789/logs" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -248,7 +248,7 @@ Rolls back the specified deployment by creating a new deployment targeting the m
 
 <CodeGroup>
 ```bash Request
-curl -X POST "https://api.varocloud.io/v1/deployments/dep_xyz789/rollback" \
+curl -X POST "https://inference.varo.cloud/v1/deployments/dep_xyz789/rollback" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -285,7 +285,7 @@ Cancels a deployment that is currently in the `queued` or `building` state.
 
 <CodeGroup>
 ```bash Request
-curl -X POST "https://api.varocloud.io/v1/deployments/dep_mno345/cancel" \
+curl -X POST "https://inference.varo.cloud/v1/deployments/dep_mno345/cancel" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 

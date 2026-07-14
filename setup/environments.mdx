@@ -26,7 +26,7 @@ Every new Varo Cloud project is provisioned with three ready-to-use environments
 
 In addition to the three default environments, you can create custom environments for use cases such as feature branches, load testing, or client previews. To create a custom environment:
 
-1. Open your project in the [Varo Cloud dashboard](https://app.varocloud.io).
+1. Open your project in the [Varo Cloud dashboard](https://varo.cloud).
 2. Navigate to the **Environments** tab.
 3. Click **New Environment**.
 4. Enter a name for the environment and select its type (Development, Staging, or Production behavior profile).
@@ -63,7 +63,7 @@ To promote a deployment from the dashboard:
 You can also trigger a promotion programmatically using the API by creating a new deployment against the production environment and referencing the artifact from your staging deployment:
 
 ```bash
-curl -X POST https://api.varocloud.io/v1/deployments \
+curl -X POST https://inference.varo.cloud/v1/deployments \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"project_id": "proj_abc123", "environment": "production", "source_deployment_id": "dep_abc123"}'

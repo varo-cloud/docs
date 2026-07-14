@@ -4,13 +4,13 @@ sidebarTitle: "Authentication"
 description: "Generate and manage API keys for the Varo Cloud REST API. Learn how to pass your key in requests and handle authentication errors."
 ---
 
-Varo Cloud uses API key authentication to secure all requests to the REST API. Every call you make to `https://api.varocloud.io/v1` must include a valid API key in the `Authorization` header using the Bearer token scheme. Without a properly formatted key, requests are rejected before they reach any resource endpoint.
+Varo Cloud uses API key authentication to secure all requests to the REST API. Every call you make to `https://inference.varo.cloud/v1` must include a valid API key in the `Authorization` header using the Bearer token scheme. Without a properly formatted key, requests are rejected before they reach any resource endpoint.
 
 ## Generate an API key
 
 You can create as many API keys as your plan allows. To generate a new key:
 
-1. Open the [Varo Cloud dashboard](https://app.varocloud.io) and sign in to your account.
+1. Open the [Varo Cloud dashboard](https://varo.cloud/auth) and sign in to your account.
 2. Navigate to **Settings → API Keys** in the sidebar.
 3. Click **New API Key**.
 4. Enter a descriptive name for the key (for example, `ci-pipeline-prod` or `monitoring-service`).
@@ -26,12 +26,12 @@ Pass your API key in the `Authorization` header of every request. The header val
 
 <CodeGroup>
 ```bash cURL
-curl https://api.varocloud.io/v1/projects \
+curl https://inference.varo.cloud/v1/projects \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.varocloud.io/v1/projects', {
+const response = await fetch('https://inference.varo.cloud/v1/projects', {
   headers: {
     'Authorization': `Bearer ${process.env.VARO_API_KEY}`
   }

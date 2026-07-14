@@ -6,7 +6,7 @@ description: "Configure Varo Cloud webhooks to receive signed HTTP POST notifica
 
 Webhooks let Varo Cloud notify your systems in real time when important events occur. Instead of polling the API to check whether a deployment succeeded or a new team member joined, you register an HTTPS endpoint and Varo Cloud delivers a signed HTTP POST payload to it the moment the event happens. This makes webhooks ideal for triggering CI/CD pipelines, updating internal dashboards, sending custom alerts, or keeping external systems synchronized with your Varo Cloud organization.
 
-Base URL: `https://api.varocloud.io/v1`
+Base URL: `https://inference.varo.cloud/v1`
 
 All requests require an `Authorization: Bearer YOUR_API_KEY` header.
 
@@ -30,7 +30,7 @@ Registers a new webhook endpoint with your organization. You choose which events
 
 <CodeGroup>
 ```bash Request
-curl -X POST "https://api.varocloud.io/v1/webhooks" \
+curl -X POST "https://inference.varo.cloud/v1/webhooks" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -167,7 +167,7 @@ Returns a list of all webhooks registered in your organization, including their 
 
 <CodeGroup>
 ```bash Request
-curl -X GET "https://api.varocloud.io/v1/webhooks" \
+curl -X GET "https://inference.varo.cloud/v1/webhooks" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -196,7 +196,7 @@ Permanently removes a webhook. Varo Cloud will immediately stop delivering event
 
 <CodeGroup>
 ```bash Request
-curl -X DELETE "https://api.varocloud.io/v1/webhooks/wh_zzz999" \
+curl -X DELETE "https://inference.varo.cloud/v1/webhooks/wh_zzz999" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 </CodeGroup>

@@ -7,21 +7,18 @@
     "dark": "#2251C5"
   },
   "favicon": "/favicon.svg",
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
+  "logo": "/logo.png",
   "navbar": {
     "links": [
       {
         "label": "Support",
-        "href": "mailto:support@varocloud.io"
+        "href": "mailto:support@varo.cloud"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Sign In",
-      "href": "https://app.varocloud.io"
+      "href": "https://varo.cloud/auth"
     }
   },
   "navigation": {
@@ -98,7 +95,7 @@
   "footer": {
     "socials": {
       "x": "https://x.com/varocloud",
-      "github": "https://github.com/varocloud",
+      "github": "https://github.com/varo-cloud",
       "linkedin": "https://linkedin.com/company/varocloud"
     }
   }

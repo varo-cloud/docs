@@ -57,7 +57,7 @@ This page collects answers to the questions our customers ask most often. Whethe
     Generate an API key with the **Deployer** role under **Settings → API Keys**, then call the deployments endpoint from your pipeline script:
 
     ```bash
-    curl -X POST https://api.varocloud.io/v1/projects/{project_id}/deployments \
+    curl -X POST https://inference.varo.cloud/v1/projects/{project_id}/deployments \
       -H "Authorization: Bearer YOUR_API_KEY" \
       -H "Content-Type: application/json" \
       -d '{"ref": "main"}'
@@ -79,6 +79,6 @@ This page collects answers to the questions our customers ask most often. Whethe
   </Accordion>
 
   <Accordion title="How is usage calculated?">
-    Usage is measured across three dimensions: compute (vCPU-hours), memory (GB-hours), and outbound bandwidth (GB transferred). Each plan includes a monthly allowance for all three, and overages are billed at the per-unit rates listed on the [pricing page](https://varocloud.io/pricing). You can view a real-time breakdown of your current-period consumption under **Settings → Billing → Usage**.
+    Usage is measured across three dimensions: compute (vCPU-hours), memory (GB-hours), and outbound bandwidth (GB transferred). Each plan includes a monthly allowance for all three, and overages are billed at the per-unit rates listed on the [pricing page](https://varo.cloud/pricing). You can view a real-time breakdown of your current-period consumption under **Settings → Billing → Usage**.
   </Accordion>
 </AccordionGroup>

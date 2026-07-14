@@ -4,7 +4,7 @@ sidebarTitle: "First Deployment"
 description: "Walk through creating a project, configuring an environment, and triggering your first deployment on Varo Cloud from the dashboard or API."
 ---
 
-Deploying an application on Varo Cloud takes just a few steps — you can trigger a deployment directly from the dashboard at [app.varocloud.io](https://app.varocloud.io) or programmatically through the API. This guide walks you through both paths, shows you how to monitor progress in real time, and explains how to roll back if something goes wrong.
+Deploying an application on Varo Cloud takes just a few steps — you can trigger a deployment directly from the dashboard at [varo.cloud](https://varo.cloud) or programmatically through the API. This guide walks you through both paths, shows you how to monitor progress in real time, and explains how to roll back if something goes wrong.
 
 ## Before you begin
 
@@ -22,7 +22,7 @@ The Varo Cloud dashboard gives you a visual interface to configure and launch de
 
 <Steps>
   <Step title="Open your project">
-    Log in to [app.varocloud.io](https://app.varocloud.io) and select the project you want to deploy from the Projects list on your home screen.
+    Log in to [varo.cloud/auth](https://varo.cloud/auth) and select the project you want to deploy from the Projects list on your home screen.
   </Step>
   <Step title="Click New Deployment">
     Inside your project, navigate to the **Deployments** tab and click the **New Deployment** button in the top-right corner.
@@ -48,7 +48,7 @@ The Varo Cloud dashboard gives you a visual interface to configure and launch de
 You can also trigger a deployment with a single API call. This is useful for CI/CD pipelines, scripts, or any automation that runs outside the dashboard.
 
 ```bash
-curl -X POST https://api.varocloud.io/v1/deployments \
+curl -X POST https://inference.varo.cloud/v1/deployments \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -84,7 +84,7 @@ Once a deployment is underway, you can follow its progress from the dashboard or
 **From the API:** Poll the deployment endpoint to check status and retrieve build output:
 
 ```bash
-curl https://api.varocloud.io/v1/deployments/dep_xyz789 \
+curl https://inference.varo.cloud/v1/deployments/dep_xyz789 \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -109,7 +109,7 @@ If a deployment introduces a problem, you can instantly roll back to the previou
 **From the API:** Send a POST request to the rollback endpoint, referencing the deployment ID you want to restore:
 
 ```bash
-curl -X POST https://api.varocloud.io/v1/deployments/dep_xyz789/rollback \
+curl -X POST https://inference.varo.cloud/v1/deployments/dep_xyz789/rollback \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 

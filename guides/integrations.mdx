@@ -4,7 +4,7 @@ sidebarTitle: "Integrations"
 description: "Connect Varo Cloud to GitHub, Slack, Datadog, and other tools. Automate deployments, route alerts, and sync metrics with your existing stack."
 ---
 
-Varo Cloud integrates with the tools your team already uses so you can automate deployments, route notifications to the right channels, and pipe metrics into your existing observability stack — without changing the way you work. Integrations are managed from **Settings → Integrations** in your dashboard at [app.varocloud.io](https://app.varocloud.io).
+Varo Cloud integrates with the tools your team already uses so you can automate deployments, route notifications to the right channels, and pipe metrics into your existing observability stack — without changing the way you work. Integrations are managed from **Settings → Integrations** in your dashboard at [varo.cloud](https://varo.cloud).
 
 ## Available integrations
 
@@ -83,7 +83,7 @@ jobs:
     steps:
       - name: Trigger deployment
         run: |
-          curl -X POST https://api.varocloud.io/v1/deployments \
+          curl -X POST https://inference.varo.cloud/v1/deployments \
             -H "Authorization: Bearer ${{ secrets.VARO_API_KEY }}" \
             -H "Content-Type: application/json" \
             -d '{"project_id": "${{ vars.VARO_PROJECT_ID }}", "environment": "production"}'

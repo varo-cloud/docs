@@ -4,7 +4,7 @@ sidebarTitle: "Monitoring"
 description: "View real-time logs, application metrics, and set up alerts for your Varo Cloud deployments to catch issues before they affect users."
 ---
 
-Varo Cloud gives you visibility into every deployment through real-time logs, application metrics, and configurable alerts. Whether you are debugging a failed build, tracking latency after a release, or setting up proactive notifications for your on-call rotation, all of these tools are available directly from your dashboard at [app.varocloud.io](https://app.varocloud.io) and through the API.
+Varo Cloud gives you visibility into every deployment through real-time logs, application metrics, and configurable alerts. Whether you are debugging a failed build, tracking latency after a release, or setting up proactive notifications for your on-call rotation, all of these tools are available directly from your dashboard at [varo.cloud](https://varo.cloud) and through the API.
 
 ## Deployment logs
 
@@ -19,7 +19,7 @@ Varo Cloud surfaces three log levels:
 You can also retrieve the status and metadata for a deployment programmatically — for example, to detect failure conditions in a script or CI/CD pipeline. Use the `GET /deployments/{id}` endpoint and inspect the `status` field:
 
 ```bash
-curl https://api.varocloud.io/v1/deployments/dep_xyz789 \
+curl https://inference.varo.cloud/v1/deployments/dep_xyz789 \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
