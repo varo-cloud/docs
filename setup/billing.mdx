@@ -1,112 +1,68 @@
 ---
-title: "Varo Cloud Plans, Billing, and Usage Management"
+title: "Varo Cloud Billing, Top-Ups, and Usage"
 sidebarTitle: "Billing"
-description: "Understand Varo Cloud pricing plans, manage your subscription, view usage, download invoices, configure spend alerts, and update your payment method."
+description: "Varo Cloud uses prepaid credits. Learn how to top up your balance, set up auto top-up, choose a payment method, and review your usage and transaction history."
 ---
 
-Varo Cloud offers tiered pricing plans to match your team size and usage needs. Whether you are a solo developer experimenting with a side project or an enterprise team running mission-critical workloads, there is a plan designed to scale with you. All billing is managed from the **Settings → Billing** section of your dashboard.
+Varo Cloud billing is **prepaid**: you top up a cash balance, and each generation you run — whether through the API, the AI Generator, or the Playground — is deducted from that balance at the model's listed price. There are no subscriptions or monthly plans. Everything is managed from the **Billing** section of your dashboard.
 
-## Plans overview
+## How pricing works
 
-<CardGroup cols={3}>
-  <Card title="Starter" icon="seedling" href="/setup/billing">
-    **Free**
+Every model has its own price, listed on the [Pricing](https://varo.cloud/pricing) page and on each model's detail page. Depending on the model type, prices are quoted:
 
-    The Starter plan is ideal for individuals and small projects. It includes:
+- **Per second** of generated video or audio
+- **Per image**
+- **Per million tokens** for language models
 
-    - 1 active project
-    - 3 default environments per project
-    - Community support via the Varo Cloud forum
-    - Standard build minutes and bandwidth allowances
+The exact cost of each run is recorded against your balance and visible in your billing history and generation history.
 
-    No credit card is required to get started on the Starter plan.
-  </Card>
-  <Card title="Pro" icon="bolt" href="/setup/billing">
-    **Paid (monthly or annual)**
+## Top up your balance
 
-    The Pro plan is designed for growing teams that need more headroom and reliability. It includes everything in Starter, plus:
+To add funds:
 
-    - Unlimited projects
-    - Priority email and chat support
-    - Advanced monitoring and alerting
-    - Higher build minute and bandwidth limits
-    - Team member roles and permissions
-  </Card>
-  <Card title="Enterprise" icon="building" href="/setup/billing">
-    **Custom pricing**
+1. Go to **Billing** in the dashboard and click **Top Up**.
+2. Choose a package — **Starter**, **Pro**, **Business** — or enter a **custom amount** (a minimum applies).
+3. Select a payment method and continue to checkout.
 
-    The Enterprise plan is built for organizations with strict compliance, security, and scale requirements. It includes everything in Pro, plus:
-
-    - Custom SLA with guaranteed uptime
-    - Dedicated support and a named account manager
-    - Single sign-on (SSO) via SAML or OIDC
-    - Invoiced billing and purchase order support
-    - Advanced audit logging and compliance exports
-  </Card>
-</CardGroup>
-
-## View your current plan
-
-To see which plan your organization is on and a summary of your current usage, navigate to **Settings → Billing** in the dashboard. The Billing overview page shows:
-
-- Your active plan name and renewal date.
-- A usage summary for the current billing period, including deployments, build minutes, and bandwidth consumed.
-- Any pending invoices or payment issues that require attention.
-
-## Upgrade or downgrade
-
-You can change your plan at any time from the dashboard. To upgrade or downgrade:
-
-1. Go to **Settings → Billing**.
-2. Click **Change Plan**.
-3. Select the plan you want to switch to.
-4. Review the pricing details and confirm the change.
-
-<Note>
-  Plan changes are prorated. If you upgrade mid-cycle, you are charged only for the remaining days in the billing period at the new plan's rate. If you downgrade, the unused portion of your current plan is credited toward future invoices.
-</Note>
-
-<Warning>
-  Downgrading may reduce your project or team member limits. Review the impact before confirming. If your current usage exceeds the limits of the lower plan, you will need to archive projects or remove team members before the downgrade takes effect.
-</Warning>
+Your balance updates as soon as the payment is confirmed. If a payment shows as **Processing**, the balance updates once the provider confirms it.
 
 ## Payment methods
 
-Varo Cloud accepts the following payment methods for Starter and Pro plans:
+Varo Cloud supports the following payment methods:
 
-- **Visa**
-- **Mastercard**
-- **American Express (AMEX)**
+- **Card** — Visa, Mastercard, and other major cards via Stripe hosted checkout.
+- **Alipay / WeChat Pay**
+- **Crypto**
 
-Enterprise customers can arrange **invoiced billing** with net payment terms and purchase order support — contact your account manager to set this up.
+Receipts and invoices for completed top-ups are available from the transaction details in your billing history.
 
-To add or update a credit card, go to **Settings → Billing → Payment Methods** and click **Add Payment Method**. Enter your card details in the secure form (powered by Stripe) and click **Save**. Your new card is charged at the next billing cycle. You can also set a card as the default or remove an existing card from this page.
+## Auto top-up
 
-## Usage and invoices
+To avoid running out of balance mid-workload, you can enable **Auto Top-up**:
 
-Varo Cloud tracks your resource consumption throughout each billing period. To view your usage breakdown:
+1. Go to **Billing** and open the **Auto top-up** settings.
+2. Set the threshold — **when balance goes below** this amount, a top-up is triggered.
+3. Set the **auto top-up amount** to add each time.
+4. Click **Enable Auto Top-up**.
 
-1. Go to **Settings → Billing → Usage**.
-2. Select the billing period you want to review from the date picker.
+<Note>
+  Auto top-up currently supports **Stripe (card)** only, and may take a few minutes to process — set your threshold with enough headroom that you don't run out before the top-up lands.
+</Note>
 
-The usage report shows consumption across three dimensions:
+## Usage and history
 
-- **Deployments** — Total number of deployments triggered in the period.
-- **Build minutes** — Cumulative time spent building your applications.
-- **Bandwidth** — Total data transferred out to end users.
+The Billing overview shows four figures at a glance:
 
-To download a PDF invoice for any completed billing period, go to **Settings → Billing → Invoices**, find the invoice in the list, and click **Download PDF**. Invoices are available for all historical billing periods since your account was created.
+- **Cash Balance** — what you have available to spend right now.
+- **Spent this Month** — with a comparison against last month.
+- **Total Top-up** — everything you have ever added.
+- **Total Spent** — everything you have ever consumed.
 
-## Billing alerts
+Below that, two tabs break down the detail:
 
-To avoid unexpected charges, you can configure a spend alert that notifies you when your estimated monthly bill reaches a threshold you define.
+- **Billing** — every charge, with the time, style (API, Web, or Playground), task ID, status, the API key used, and the amount. You can export these records to CSV.
+- **Transactions** — every top-up, with its provider, payment method, amount, processing fee, and links to the receipt or invoice.
 
-To set a billing alert:
-
-1. Go to **Settings → Billing → Alerts**.
-2. Click **Add Alert**.
-3. Enter a spend threshold in your account currency (for example, `$50.00`).
-4. Choose how you want to be notified: email, webhook, or both.
-5. Click **Save Alert**.
-
-When your estimated spend for the current period crosses the threshold, Varo Cloud sends a notification immediately. You can create multiple alerts at different thresholds to get early warnings and final warnings before your budget is fully consumed.
+<Tip>
+  For a per-task view across models — prompts, status, cost, and outputs — see the **Generations** page in the dashboard.
+</Tip>

@@ -1,23 +1,23 @@
 ---
-title: "Varo Cloud Docs: Deploy, Manage, and Scale Your Apps"
+title: "Varo Cloud Docs: One API for Multiple AI Models"
 sidebarTitle: "Home"
-description: "Deploy, manage, and scale your cloud operations with Varo Cloud. Explore quickstart guides, the full API reference, and configuration docs."
+description: "Access leading video, image, audio, and language models through one unified API. Explore setup guides and the full API reference."
 ---
 
-Varo Cloud gives your team a unified platform to deploy applications, manage environments, and collaborate — all through a clean dashboard and a powerful REST API. Whether you're spinning up your first project or automating deployments at scale, these docs cover everything you need.
+Varo Cloud gives you access to leading video, image, audio, and language models through one unified API — with one balance, one dashboard, and better pricing. Whether you're testing a model in the browser or automating generations at scale, these docs cover everything you need.
 
 <CardGroup cols={2}>
-  <Card title="Quick Start" icon="rocket" href="/quickstart">
-    Go from zero to your first deployment in under 10 minutes.
+  <Card title="Introduction" icon="lightbulb" href="/introduction">
+    What Varo Cloud is and how the platform fits together.
   </Card>
-  <Card title="Core Concepts" icon="lightbulb" href="/core-concepts">
-    Understand projects, environments, and deployments before you dive in.
+  <Card title="Account Setup" icon="user" href="/setup/account">
+    Sign in with your email and a one-time code — no password needed.
+  </Card>
+  <Card title="Authentication" icon="key" href="/setup/authentication">
+    Create API keys and authenticate your requests.
   </Card>
   <Card title="API Reference" icon="code" href="/api-reference/introduction">
-    Full reference for every REST endpoint with request and response examples.
-  </Card>
-  <Card title="Guides" icon="book-open" href="/guides/first-deployment">
-    Step-by-step walkthroughs for common tasks and integrations.
+    Full reference for every endpoint with request and response examples.
   </Card>
 </CardGroup>
 
@@ -25,16 +25,16 @@ Varo Cloud gives your team a unified platform to deploy applications, manage env
 
 <Steps>
   <Step title="Create your account">
-    Sign up at [varo.cloud/auth](https://varo.cloud/auth) and verify your email address.
+    Sign in at [varo.cloud/auth](https://varo.cloud/auth) with your email and a one-time verification code. Your account is created automatically on first sign-in.
   </Step>
-  <Step title="Create a project">
-    In the dashboard, click **New Project**, give it a name, and choose your region.
+  <Step title="Top up your balance">
+    Varo Cloud is prepaid — add funds from the **Billing** page by card, Alipay / WeChat Pay, or crypto.
   </Step>
   <Step title="Generate an API key">
-    Navigate to **Settings → API Keys** and create a key. Store it securely — you'll use it to authenticate every API request.
+    Go to **API Keys** in the dashboard and click **Create Key**. Store it securely — it's shown only once.
   </Step>
-  <Step title="Deploy your first app">
-    Push your code or follow the [First Deployment guide](/guides/first-deployment) to trigger your first deployment from the dashboard or API.
+  <Step title="Run your first generation">
+    Try a model in the **AI Generator**, or call `POST /v1/generations` from your own code. Every model's API tab has ready-to-run examples.
   </Step>
 </Steps>
 
@@ -42,25 +42,16 @@ Varo Cloud gives your team a unified platform to deploy applications, manage env
 
 <CardGroup cols={3}>
   <Card title="Account Setup" icon="user" href="/setup/account">
-    Profile, organization settings, and team access.
+    Email sign-in, verification codes, and dashboard basics.
   </Card>
   <Card title="Authentication" icon="key" href="/setup/authentication">
-    API keys, tokens, and securing your requests.
-  </Card>
-  <Card title="Environments" icon="layer-group" href="/setup/environments">
-    Manage dev, staging, and production separately.
-  </Card>
-  <Card title="Monitoring" icon="chart-line" href="/guides/monitoring">
-    Logs, metrics, and alerting for your deployments.
-  </Card>
-  <Card title="Integrations" icon="plug" href="/guides/integrations">
-    Connect Varo Cloud to your existing tools.
+    API keys and securing your requests.
   </Card>
   <Card title="Billing" icon="credit-card" href="/setup/billing">
-    Plans, usage, and invoice management.
+    Top-ups, payment methods, auto top-up, and usage history.
   </Card>
 </CardGroup>
 
 <Tip>
-  Have a question not answered here? Email us at [support@varo.cloud](mailto:support@varo.cloud) or check the [FAQ](/support/faq).
+  Have a question not answered here? Email us at [support@varo.cloud](mailto:support@varo.cloud).
 </Tip>

@@ -29,9 +29,7 @@
           {
             "group": "Get Started",
             "pages": [
-              "introduction",
-              "quickstart",
-              "core-concepts"
+              "introduction"
             ]
           },
           {
@@ -39,24 +37,7 @@
             "pages": [
               "setup/account",
               "setup/authentication",
-              "setup/environments",
               "setup/billing"
-            ]
-          },
-          {
-            "group": "Guides",
-            "pages": [
-              "guides/first-deployment",
-              "guides/integrations",
-              "guides/monitoring",
-              "guides/team-management"
-            ]
-          },
-          {
-            "group": "Support",
-            "pages": [
-              "support/faq",
-              "support/troubleshooting"
             ]
           }
         ]
