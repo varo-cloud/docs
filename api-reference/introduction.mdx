@@ -88,23 +88,3 @@ Every API response includes the following headers so you can monitor your usage:
 | `X-RateLimit-Reset` | Unix timestamp when the current window resets |
 
 When you exceed the limit, the API returns a `429 Too Many Requests` response. Wait until the `X-RateLimit-Reset` time before retrying. See the [Errors](/api-reference/errors) page for retry guidance.
-
-## Available Resources
-
-<CardGroup cols={2}>
-  <Card title="Projects" icon="folder" href="/api-reference/resources/projects">
-    Create, configure, and delete projects. Manage project-level settings and environment variables.
-  </Card>
-  <Card title="Deployments" icon="rocket" href="/api-reference/resources/deployments">
-    Trigger and monitor deployments, roll back to previous versions, and inspect deployment logs.
-  </Card>
-  <Card title="Users" icon="users" href="/api-reference/resources/users">
-    Invite team members, update roles, and remove users from your organization.
-  </Card>
-  <Card title="Integrations" icon="plug" href="/api-reference/resources/integrations">
-    Connect third-party services and manage credentials for your integrated tools.
-  </Card>
-  <Card title="Webhooks" icon="webhook" href="/api-reference/webhooks">
-    Register and manage webhook endpoints to receive real-time event notifications.
-  </Card>
-</CardGroup>

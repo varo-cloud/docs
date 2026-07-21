@@ -53,21 +53,6 @@
               "api-reference/authentication",
               "api-reference/errors"
             ]
-          },
-          {
-            "group": "Resources",
-            "pages": [
-              "api-reference/resources/projects",
-              "api-reference/resources/deployments",
-              "api-reference/resources/users",
-              "api-reference/resources/integrations"
-            ]
-          },
-          {
-            "group": "Webhooks",
-            "pages": [
-              "api-reference/webhooks"
-            ]
           }
         ]
       }
