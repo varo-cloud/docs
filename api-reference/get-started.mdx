@@ -56,9 +56,11 @@ All requests to the Varo Cloud API are authenticated with a bearer token. To cre
   Treat your API key like a password. If a key is ever exposed, rotate it immediately from the dashboard.
 </Warning>
 
-## Step 2: Run Your First Generation
+## Step 2: Create a Generation
 
-Let's create an image. Send a `POST` request to `/v1/generations` with the model you want to run and its inputs. Pass your key in the `Authorization` header as a bearer token:
+Let's create an image. Send a `POST` request to `/v1/generations` with the model you want to run and its inputs. Pass your key in the `Authorization` header as a bearer token.
+
+Generations run **asynchronously**: this request creates a task and returns immediately with an `id` and a `status`. You'll poll that `id` in the next step to get the finished asset.
 
 <CodeGroup>
 
@@ -92,7 +94,7 @@ const response = await fetch("https://inference.varo.cloud/v1/generations", {
 });
 
 const generation = await response.json();
-console.log(generation.output.url);
+console.log(generation.id, generation.status);
 ```
 
 ```python Python
@@ -115,12 +117,84 @@ response = requests.post(
 )
 
 generation = response.json()
-print(generation["output"]["url"])
+print(generation["id"], generation["status"])
 ```
 
 </CodeGroup>
 
-## Step 3: Read the Response
+## Step 3: Poll for the Result
+
+Fetch the generation by its `id` and keep polling until its `status` becomes `completed` (or `succeeded`). If it comes back `failed`, stop and read the error message.
+
+<CodeGroup>
+
+```bash cURL
+# Poll until status is completed or succeeded
+while true; do
+  response=$(curl -s https://inference.varo.cloud/v1/generations/$GENERATION_ID \
+    -H "Authorization: Bearer $VARO_API_KEY")
+  status=$(echo "$response" | jq -r '.status')
+  if [ "$status" = "completed" ] || [ "$status" = "succeeded" ]; then
+    echo "$response" | jq -r '.output.url'
+    break
+  fi
+  if [ "$status" = "failed" ]; then
+    echo "$response" | jq -r '.error.message // "Generation failed"' >&2
+    exit 1
+  fi
+  sleep 5
+done
+```
+
+```javascript Node.js
+async function pollGeneration(id) {
+  while (true) {
+    const res = await fetch(
+      `https://inference.varo.cloud/v1/generations/${id}`,
+      { headers: { Authorization: `Bearer ${process.env.VARO_API_KEY}` } }
+    );
+    const generation = await res.json();
+
+    if (["completed", "succeeded"].includes(generation.status)) {
+      return generation.output.url;
+    }
+    if (generation.status === "failed") {
+      throw new Error(generation.error?.message ?? "Generation failed");
+    }
+    await new Promise((r) => setTimeout(r, 5000));
+  }
+}
+
+console.log(await pollGeneration(generation.id));
+```
+
+```python Python
+import time
+
+def poll_generation(generation_id):
+    while True:
+        res = requests.get(
+            f"https://inference.varo.cloud/v1/generations/{generation_id}",
+            headers={"Authorization": f"Bearer {os.environ['VARO_API_KEY']}"},
+        )
+        generation = res.json()
+
+        if generation["status"] in ("completed", "succeeded"):
+            return generation["output"]["url"]
+        if generation["status"] == "failed":
+            raise RuntimeError(generation.get("error", {}).get("message", "Generation failed"))
+        time.sleep(5)
+
+print(poll_generation(generation["id"]))
+```
+
+</CodeGroup>
+
+<Tip>
+  Poll every few seconds rather than in a tight loop. Image models usually finish in seconds; video models can take longer.
+</Tip>
+
+## Step 4: Read the Response
 
 The API returns a **generation object**. When `status` is `completed`, `output.url` points to your finished asset:
 
@@ -154,7 +228,7 @@ The API returns a **generation object**. When `status` is `completed`, `output.u
   If you get back a `401 Unauthorized`, double-check that your key is correct, starts with `sk_live_`, and hasn't been revoked. See [Errors](/api-reference/errors) for the full list of response codes.
 </Warning>
 
-## Step 4: Try Another Model
+## Step 5: Try Another Model
 
 The same endpoint runs every model on the platform — just change the `model` field and its inputs. Here's a video model instead of an image one:
 
