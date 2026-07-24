@@ -17,8 +17,8 @@ All error responses share the same envelope structure. The top-level `error` obj
     "message": "The request body contains invalid fields.",
     "details": [
       {
-        "field": "environment",
-        "issue": "must be one of: development, staging, production"
+        "field": "model",
+        "issue": "is required"
       }
     ],
     "request_id": "req_abc123"
@@ -68,7 +68,7 @@ The `error.code` field contains a stable, machine-readable string that identifie
 When the API returns a `validation_error`, the `error.details` array contains one entry per invalid field, each with a `field` name and an `issue` description. Iterate over `details` to surface actionable feedback:
 
 ```javascript
-const res = await fetch('https://inference.varo.cloud/v1/deployments', {
+const res = await fetch('https://inference.varo.cloud/v1/generations', {
   method: 'POST',
   headers: {
     'Authorization': `Bearer ${apiKey}`,

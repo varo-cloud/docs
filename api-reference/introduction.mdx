@@ -1,10 +1,10 @@
 ---
-title: "Varo Cloud REST API Reference: Overview and Concepts"
+title: "Varo Cloud API Reference: Overview and Concepts"
 sidebarTitle: "Overview"
-description: "The Varo Cloud REST API lets you manage projects, environments, deployments, and team members programmatically. Base URL and versioning explained."
+description: "The Varo Cloud API runs AI models — video, image, audio, and language — through one endpoint. Base URL, authentication, the generation lifecycle, and versioning explained."
 ---
 
-The Varo Cloud REST API gives you programmatic access to everything available in the dashboard — create and configure projects, trigger deployments, manage team members, and automate your entire cloud workflow from your own tools and scripts.
+The Varo Cloud API gives you programmatic access to the same models you can run in the dashboard. One endpoint runs every model on the platform: you submit a **generation** with a model and its inputs, then poll it until the result is ready. There are no projects, environments, or deployments to manage — just models and the generations you create with them.
 
 ## Base URL
 
@@ -14,77 +14,86 @@ All API requests are made over HTTPS to the following base URL:
 https://inference.varo.cloud/v1
 ```
 
-Every endpoint path is appended directly to this base. Here is a minimal example that lists your projects:
+Every endpoint path is appended directly to this base. Here is a minimal example that creates a generation:
 
 ```bash
-curl https://inference.varo.cloud/v1/projects \
-  -H "Authorization: Bearer YOUR_API_KEY"
+curl -X POST https://inference.varo.cloud/v1/generations \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "google-nano-banana-pro/text-to-image", "prompt": "a cat on a windowsill"}'
 ```
+
+## Authentication
+
+Every request must include your API key as a bearer token in the `Authorization` header. Keys start with `sk_live_` and are created from the **API Keys** page in your dashboard.
+
+```text
+Authorization: Bearer sk_live_...
+```
+
+See [Authentication](/api-reference/authentication) for how to create, store, and manage keys.
+
+## The generation lifecycle
+
+Generations run **asynchronously**. Rather than blocking until a model finishes — which can take seconds to minutes — the API splits the work into two calls:
+
+<Steps>
+  <Step title="Create a generation">
+    `POST /v1/generations` with a `model` and its inputs. The response returns immediately with an `id` and an initial `status` (such as `queued`).
+  </Step>
+  <Step title="Poll for the result">
+    `GET /v1/generations/{id}` until `status` becomes `completed` (or `succeeded`). When it does, `output.url` points to your finished asset. If `status` is `failed`, read `error.message`.
+  </Step>
+</Steps>
+
+The [Get Started](/api-reference/get-started) guide walks through this end to end with runnable cURL, Node.js, and Python examples.
 
 ## Versioning
 
 The current API version is `v1`, reflected in the base URL path. When Varo Cloud introduces changes that would break existing integrations — such as removing a field, changing a field's type, or altering existing behavior — a new version prefix (e.g., `/v2`) will be released and the previous version will continue to work during a deprecation window.
 
-Non-breaking additions, including new optional fields on existing responses, new query parameters, and entirely new endpoints, are rolled out without a version bump. You should write your integration to ignore unknown fields so these additions do not affect your code.
+Non-breaking additions, including new optional fields on existing responses and entirely new endpoints, are rolled out without a version bump. Write your integration to ignore unknown fields so these additions do not affect your code.
 
-## Request Format
+## Request format
 
-All request bodies must be sent as JSON. Include the `Content-Type: application/json` header on every request that has a body, such as `POST`, `PUT`, and `PATCH` requests. All responses from the API are also JSON.
+Send request bodies as JSON and include the `Content-Type: application/json` header on every request that has a body. All responses are JSON as well.
 
-## Response Format
+## Response format
 
-Successful responses are wrapped in a standard envelope. A single-resource response looks like this:
+A generation is returned as a flat JSON object. The fields you'll use most are `status`, `output`, and `usage`:
 
 ```json
 {
-  "data": { "..." },
-  "meta": {
-    "request_id": "req_abc123",
-    "timestamp": "2024-01-15T10:30:00Z"
+  "id": "9d481365-2b49-4e94-ac9b-c3d2db5b2374",
+  "object": "generation",
+  "status": "completed",
+  "model": "google-nano-banana-pro/text-to-image",
+  "created_at": 1783996705,
+  "output": {
+    "type": "image",
+    "url": "https://cdn.example.com/generations/.../result.jpeg"
+  },
+  "usage": {
+    "cost_usd": 0.04
   }
 }
 ```
 
-When an endpoint returns a list of resources, the envelope includes a `pagination` object alongside `data`:
+| Field | Description |
+|---|---|
+| `id` | Unique identifier for the generation — pass it to `GET /v1/generations/{id}` to poll. |
+| `status` | Generation state — `queued`, `processing`, `completed`/`succeeded`, or `failed`. |
+| `model` | The model that produced the output. |
+| `output.type` | `image` or `video`, depending on the model. |
+| `output.url` | Direct link to download the generated asset (present once `completed`). |
+| `usage.cost_usd` | Cost of the generation, in USD, deducted from your balance. |
 
-```json
-{
-  "data": ["..."],
-  "pagination": {
-    "total": 42,
-    "page": 1,
-    "per_page": 20,
-    "next_cursor": "cursor_xyz"
-  },
-  "meta": { "request_id": "req_abc123" }
-}
-```
+When a request fails, the API returns an error object instead. See [Errors](/api-reference/errors) for the full format and status codes.
 
-The `meta.request_id` field is present on every response. Include it when contacting support so issues can be traced quickly.
-
-## Pagination
-
-List endpoints use cursor-based pagination. Rather than requesting results by page number, you pass the `next_cursor` value returned in the previous response as the `cursor` query parameter of your next request. This approach stays consistent even when records are added or removed between requests.
-
-Use the `per_page` parameter to control how many items are returned per page (maximum 100). If `next_cursor` is absent from the response, you have reached the last page.
-
-```bash
-curl "https://inference.varo.cloud/v1/deployments?per_page=50&cursor=cursor_xyz" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
-
-## Rate Limits
+## Rate limits
 
 <Note>
-  The default rate limit is **1,000 requests per 10-minute window** per API key. If you need a higher limit for production workloads, contact Varo Cloud support to discuss an increased quota.
+  API keys are subject to rate limits. When you exceed your limit, the API returns a `429 Too Many Requests` response — read the `X-RateLimit-Reset` header for the Unix timestamp when your quota resets, and wait until then before retrying. If you need a higher limit for production workloads, contact Varo Cloud support.
 </Note>
 
-Every API response includes the following headers so you can monitor your usage:
-
-| Header | Description |
-|---|---|
-| `X-RateLimit-Limit` | Total requests allowed in the current window |
-| `X-RateLimit-Remaining` | Requests remaining in the current window |
-| `X-RateLimit-Reset` | Unix timestamp when the current window resets |
-
-When you exceed the limit, the API returns a `429 Too Many Requests` response. Wait until the `X-RateLimit-Reset` time before retrying. See the [Errors](/api-reference/errors) page for retry guidance.
+See the [Errors](/api-reference/errors) page for retry guidance and a backoff helper.

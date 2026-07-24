@@ -16,7 +16,7 @@ Before you start, make sure you have:
 
 <CardGroup cols={2}>
   <Card title="A Varo Cloud account" icon="user" href="https://varo.cloud/auth">
-    [Sign up](https://varo.cloud/auth) if you don't have one yet — the free tier is enough to start building with multiple models.
+    [Sign up](https://varo.cloud/auth) if you don't have one yet — all it takes is your email and a verification code.
   </Card>
 
   <Card title="An API key" icon="key">
@@ -41,7 +41,7 @@ All requests to the Varo Cloud API are authenticated with a bearer token. To cre
     Sign in at [varo.cloud/auth](https://varo.cloud/auth) and open **API Keys** in your dashboard.
   </Step>
   <Step title="Create a new key">
-    Click **Create key**, give it a descriptive name (e.g. `local-dev` or `ci-pipeline`), and choose the scopes it needs.
+    Click **Create Key** and give it a descriptive name (e.g. `local-dev` or `ci-pipeline`).
   </Step>
   <Step title="Copy and store it securely">
     The full key is shown **only once**. Copy it immediately and store it in a secret manager or environment variable — never commit it to source control.
@@ -53,7 +53,7 @@ All requests to the Varo Cloud API are authenticated with a bearer token. To cre
 </Steps>
 
 <Warning>
-  Treat your API key like a password. If a key is ever exposed, rotate it immediately from the dashboard.
+  Treat your API key like a password. If a key is ever exposed, delete it from the dashboard and create a new one right away.
 </Warning>
 
 ## Step 2: Create a Generation
@@ -207,7 +207,7 @@ The API returns a **generation object**. When `status` is `completed`, `output.u
   "created_at": 1783996705,
   "output": {
     "type": "image",
-    "url": "https://staging-assets.varo.cloud/generations/.../result.jpeg"
+    "url": "https://cdn.example.com/generations/.../result.jpeg"
   },
   "usage": {
     "cost_usd": 0.04
@@ -253,7 +253,7 @@ The response has the same shape, with `output.type` set to `video`:
   "created_at": 1783996705,
   "output": {
     "type": "video",
-    "url": "https://staging-assets.varo.cloud/generations/.../result.mp4"
+    "url": "https://cdn.example.com/generations/.../result.mp4"
   },
   "usage": {
     "cost_usd": 0.5
@@ -275,7 +275,7 @@ You've run your first model and retrieved a result. Here's where to go next:
   </Card>
 
   <Card title="Authentication Deep Dive" icon="key" href="/api-reference/authentication">
-    Learn about key scopes, rotation, and best practices.
+    Learn about creating keys, storage, and security best practices.
   </Card>
 
   <Card title="Errors" icon="triangle-exclamation" href="/api-reference/errors">
